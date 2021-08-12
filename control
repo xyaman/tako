@@ -1,0 +1,9 @@
+Package: com.xyaman.tako
+Name: Tako
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: Notification priority hub tweak
+Maintainer: Xyaman
+Author: Xyaman
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
