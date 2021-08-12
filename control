@@ -6,4 +6,4 @@ Description: Notification priority hub tweak
 Maintainer: Xyaman
 Author: Xyaman
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000)
+Depends: mobilesubstrate, com.xyaman.libkuro

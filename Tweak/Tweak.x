@@ -1,5 +1,63 @@
 #import "Tweak.h"
 
+// History notifications
+%hook NCNotificationListSectionHeaderView
+- (void) didMoveToWindow {
+    self.hidden = YES;
+}
+- (CGRect) frame {
+    return CGRectMake(0, 0, 0, 0);
+}
+- (BOOL) hidden {
+    return YES;
+}
+%end
+
+// Hide older notifications
+%hook NCNotificationListSectionRevealHintView
+- (void) didMoveToWindow {
+    self.hidden = YES;
+}
+
+- (CGRect) frame {
+    return CGRectMake(0, 0, 0, 0);
+}
+
+- (BOOL) hidden {
+    return YES;
+}
+%end
+
+// Hide controls on stack notifications
+%hook NCNotificationListCoalescingHeaderCell
+- (void) didMoveToWindow {
+    self.hidden = YES;
+}
+
+- (CGRect) frame {
+    return CGRectMake(0, 0, 0, 0);
+}
+
+- (BOOL) hidden {
+    return YES;
+}
+%end
+
+// Hide controls on stack notifications
+%hook NCNotificationListCoalescingControlsCell
+- (void) didMoveToWindow {
+    self.hidden = YES;
+}
+
+- (CGRect) frame {
+    return CGRectMake(0, 0, 0, 0);
+}
+
+- (BOOL) hidden {
+    return YES;
+}
+%end
+
 %hook NCNotificationStructuredListViewController
 - (id) init {
     id orig = %orig;
@@ -8,26 +66,29 @@
 }
 
 -(void)insertNotificationRequest:(NCNotificationRequest *)notification {
-    
+
+    if([TKOController sharedInstance].isTkoCall) {
+        %orig;
+        [self revealNotificationHistory:YES animated:YES];
+        return;
+    }
+
+    [[TKOController sharedInstance] insertNotificationRequest:notification];
+}
+
+-(void)modifyNotificationRequest:(NCNotificationRequest* )notification {
+    // Probably never lol
     if([TKOController sharedInstance].isTkoCall) return %orig;
 
-    // %orig;
-    [[TKOController sharedInstance] insertNotificationRequest:notification];
-
-    // NSLog(@"[TakoTweak] %@", notification.bulletin.sectionID);
-    // NSLog(@"[TakoTweak] %@", notification.notificationIdentifier);
+    [[TKOController sharedInstance] modifyNotificationRequest:notification];
 }
 
 -(void)removeNotificationRequest:(NCNotificationRequest *)notification {
     if([TKOController sharedInstance].isTkoCall) return %orig;
-
-    // %orig;
     [[TKOController sharedInstance] removeNotificationRequest:notification];
-
-    // NSLog(@"[TakoTweak] removed: %@", notification.bulletin.sectionID);
 }
-%end
 
+%end
 
 %hook CSNotificationAdjunctListViewController
 %property (nonatomic, retain) TKOView *tkoView;
@@ -36,15 +97,29 @@
 
     if(self.tkoView) return;
 
-    self.stackView.alignment = UIStackViewAlignmentFill;
+    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 80)];;
 
-    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 64)];;
     [TKOController sharedInstance].view = self.tkoView;
     [self.stackView insertArrangedSubview:self.tkoView atIndex:0];
+
+    // [self.stackView setCustomSpacing:10 afterView:self.tkoView];
 }
 
--(BOOL)isPresentingContent {
-    return YES;
-}
+-(void)_insertItem:(id)arg0 animated:(BOOL)arg1 {
+    %orig;
 
+    [self.tkoView removeFromSuperview];
+    // [self.stackView addSubview:self.tkoView];
+    [self.stackView addArrangedSubview:self.tkoView];
+}
+-(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
+    %orig;
+
+    [self.tkoView removeFromSuperview];
+    // [self.stackView insertArrangedSubview:self.tkoView atIndex:0];
+    [self.stackView addArrangedSubview:self.tkoView];
+
+    // Force stackview update
+    self.stackView.frame = CGRectMake(0, 0, 0, 0);
+}
 %end

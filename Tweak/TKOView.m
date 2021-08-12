@@ -12,7 +12,7 @@
     // UICollection layout
     self.colLayout = [UICollectionViewFlowLayout new];
     self.colLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.colLayout.itemSize = CGSizeMake(self.frame.size.height, self.frame.size.height);
+    self.colLayout.itemSize = CGSizeMake(self.frame.size.height - 20, self.frame.size.height - 10);
     
     // UICollection
     self.colView = [[UICollectionView alloc]initWithFrame:frame collectionViewLayout:self.colLayout];
@@ -27,59 +27,125 @@
     [self addSubview:self.colView];
 
     // Current cell list info
-    self.list = [NSMutableArray new];
-
-    // NSMutableArray *bla = @{};
+    self.cellsInfo = [NSMutableArray new];
+    self.selectedBundle = nil;
 
     return self;
-}
-
-- (void) update {
-    [self.list removeAllObjects];
-
-    for(NSString *key in [TKOController sharedInstance].notifications) {
-        [self.list addObject:key];
-    }
-
-    [self.colView reloadData];
 }
 
 - (CGSize)intrinsicContentSize {
     return CGSizeMake(self.frame.size.width, self.frame.size.height);
 }
 
+- (void) update {
+    [self.cellsInfo removeAllObjects];
+
+    for(NSString *key in [TKOController sharedInstance].notifications) {
+        NSArray *bundleNotifs = [TKOController sharedInstance].notifications[key];
+        [self.cellsInfo addObject:[@{@"bundleID": key, @"count":[NSNumber numberWithInteger:bundleNotifs.count]} mutableCopy]];
+    }
+
+    [self.colView reloadData];
+}
+
+- (void) updateCellWithIdentifier:(NSString *)identifier {
+    
+    int index = 0;
+
+    for(NSMutableDictionary *cellInfo in self.cellsInfo) {
+        if([cellInfo[@"bundleID"] isEqualToString:identifier]) {
+            NSArray *bundleNotifs = [TKOController sharedInstance].notifications[identifier];
+            cellInfo[@"count"] = [NSNumber numberWithInteger:bundleNotifs.count];
+            break;
+        }
+        index += 1;
+    } 
+
+    [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
+}
+
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.list.count;
+    // if(section != 0) return 0;
+    return self.cellsInfo.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     TKOCell *cell = [self.colView dequeueReusableCellWithReuseIdentifier:@"TKOCell" forIndexPath:indexPath];
-    [cell setBundleIdentifier:self.list[indexPath.item]];
+    NSDictionary *info = self.cellsInfo[indexPath.item]; 
+
+    BOOL isSelected = [info[@"bundleID"] isEqualToString:self.selectedBundle];
+
+    // cell.icon.image = nil;
+    // cell.backgroundColor = [UIColor clearColor];
+
+    [cell setBundleIdentifier:info[@"bundleID"]];
+    [cell setCount:[info[@"count"] intValue]];
+
+    if(isSelected) {
+        [self.colView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+        // [self collectionView:self.colView didSelectItemAtIndexPath:indexPath];
+    }
+
     return cell;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
 
-    [TKOController sharedInstance].isTkoCall = YES;
-    // show all
-    NSMutableArray *reqList = [TKOController sharedInstance].notifications[self.list[indexPath.item]];
-
-    for (NSInteger i = reqList.count - 1; i >= 0; i--) {
-        [[TKOController sharedInstance].nlc insertNotificationRequest:reqList[i]];
+    NSDictionary *info = self.cellsInfo[indexPath.item]; 
+    BOOL isSelected = [info[@"bundleID"] isEqualToString:self.selectedBundle];
+    
+    if(isSelected) {
+        self.selectedBundle = nil;
+        [self.colView deselectItemAtIndexPath:indexPath animated:YES];
+        [self collectionView:self.colView didDeselectItemAtIndexPath:indexPath];
+        return NO;
     }
 
-    [TKOController sharedInstance].isTkoCall = NO;
+    // [[TKOController sharedInstance] hideAllNotifications];
+    
+    return YES;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
+    
+    NSDictionary *info = self.cellsInfo[indexPath.item];
+    self.selectedBundle = [info[@"bundleID"] copy];
+    [[TKOController sharedInstance] showNotificationAllWithIdentifier:info[@"bundleID"]];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [TKOController sharedInstance].isTkoCall = YES;
-    //
-    NSMutableArray *reqList = [TKOController sharedInstance].notifications[self.list[indexPath.item]];
+    // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
 
-    for (NSInteger i = reqList.count - 1; i >= 0; i--) {
-        [[TKOController sharedInstance].nlc removeNotificationRequest:reqList[i]];
-    }
-    [TKOController sharedInstance].isTkoCall = NO;
+    NSDictionary *info = self.cellsInfo[indexPath.item];
+    [[TKOController sharedInstance] hideNotificationAllWithIdentifier:info[@"bundleID"]];
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+
+    CGFloat itemSpacing = self.colLayout.minimumInteritemSpacing;
+    CGFloat cellWidth = self.colLayout.itemSize.width + itemSpacing;
+    UIEdgeInsets insets = self.colLayout.sectionInset;
+
+
+    // Make sure to remove the last item spacing or it will
+    // miscalculate the actual total width.
+    CGFloat totalCellWidth = (cellWidth * self.cellsInfo.count) - itemSpacing;
+    CGFloat contentWidth = self.colView.frame.size.width - self.colView.contentInset.left - self.colView.contentInset.right;
+
+
+    // If the number of cells that exist take up less room than the
+    // collection view width, then center the content with the appropriate insets.
+    // Otherwise return the default layout inset.
+    if (totalCellWidth > contentWidth) return insets;
+
+
+    // Calculate the right amount of padding to center the cells.
+    CGFloat padding = ((contentWidth - totalCellWidth) / 2.0) - itemSpacing/2;
+    insets.left = padding;
+    insets.right = padding;
+    return insets;
 }
 
 

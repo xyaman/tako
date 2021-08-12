@@ -13,8 +13,16 @@
 @property(nonatomic) BOOL isTkoCall;
 
 + (TKOController *) sharedInstance;
+- (void) showNotification:(NCNotificationRequest *)req;
+- (void) showNotificationAllWithIdentifier:(NSString *)identifier;
+- (void) hideNotification:(NCNotificationRequest *)req;
+- (void) hideNotificationAllWithIdentifier:(NSString *)identifier;
+- (void) hideAllNotifications;
 
+// NLC
 - (void) insertNotificationRequest:(NCNotificationRequest *)req;
+- (void) modifyNotificationRequest:(NCNotificationRequest* )req;
 - (void) removeNotificationRequest:(NCNotificationRequest *)req;
+
 - (UIImage *) getIconForIdentifier:(NSString *)index;
 @end
