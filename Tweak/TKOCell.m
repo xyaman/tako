@@ -63,12 +63,6 @@
     self.countLabel.text = [NSString stringWithFormat:@"%ld", count];
 }
 
-- (void) select {
-    
-}
-- (void) unselect {
-}
-
 -(void)setSelected:(BOOL)selected {
     [super setSelected:selected];
 

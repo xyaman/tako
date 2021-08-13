@@ -10,7 +10,4 @@
 
 - (void) setBundleIdentifier:(NSString *)identifier;
 - (void) setCount:(NSInteger) count;
-
-- (void) select;
-- (void) unselect;
 @end

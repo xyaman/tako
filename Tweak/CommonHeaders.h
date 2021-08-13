@@ -1,4 +1,5 @@
 @interface BBBulletin : NSObject
+@property(copy, nonatomic) NSString *title;
 @property(copy, nonatomic) NSString *sectionID;
 @end
 
@@ -64,4 +65,9 @@ typedef NS_OPTIONS(NSUInteger, MTMaterialOptions) {
 
 @interface MTMaterialView : UIView
 +(id)materialViewWithRecipe:(long long)arg1 configuration:(unsigned long long)arg2 ;
+@end
+
+@interface SBIdleTimerGlobalCoordinator : NSObject
++ (id) sharedInstance;
+-(void)resetIdleTimer;
 @end

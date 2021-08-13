@@ -1,10 +1,22 @@
 #import <UIKit/UIKit.h>
-
+#import <Cephei/HBPreferences.h>
 
 #import "CommonHeaders.h"
 #import "TKOController.h"
 #import "TKOView.h"
 
+/*----------------------
+ / Preferences
+ -----------------------*/
+HBPreferences *preferences = nil;
+BOOL isEnabled = NO;
+
+NSNumber *prefSortBy = nil;
+
+
+/*----------------------
+ / Class definitions
+ -----------------------*/
 @interface CSNotificationAdjunctListViewController : UIViewController
 @property(nonatomic, retain) UIStackView *stackView;
 @property(nonatomic, retain) TKOView *tkoView;

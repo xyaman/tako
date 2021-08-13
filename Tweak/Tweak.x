@@ -1,5 +1,12 @@
 #import "Tweak.h"
 
+void updatePrefs() {
+    [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
+    [[TKOController sharedInstance].view.colView reloadData];
+}
+
+%group TakoTweak
+
 // History notifications
 %hook NCNotificationListSectionHeaderView
 - (void) didMoveToWindow {
@@ -100,6 +107,8 @@
     self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 80)];;
 
     [TKOController sharedInstance].view = self.tkoView;
+    updatePrefs();
+
     [self.stackView insertArrangedSubview:self.tkoView atIndex:0];
 
     // [self.stackView setCustomSpacing:10 afterView:self.tkoView];
@@ -123,3 +132,17 @@
     self.stackView.frame = CGRectMake(0, 0, 0, 0);
 }
 %end
+%end
+
+%ctor {
+    preferences = [[HBPreferences alloc] initWithIdentifier:@"com.xyaman.takopreferences"];
+    [preferences registerBool:&isEnabled default:NO forKey:@"isEnabled"];
+    if(!isEnabled) return;
+
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updatePrefs, (CFStringRef)@"com.xyaman.takopreferences/ReloadPrefs", NULL, (CFNotificationSuspensionBehavior)kNilOptions);
+
+    [preferences registerObject:&prefSortBy default:@(0) forKey:@"sortBy"];
+
+    updatePrefs();
+    %init(TakoTweak);
+}

@@ -30,7 +30,7 @@
 
     // If it doesn't exist, create array, then add item
     } else {
-        [self.notifications setObject:[NSMutableArray new] forKey:req.bulletin.sectionID];
+        @synchronized(self.notifications) {[self.notifications setObject:[NSMutableArray new] forKey:req.bulletin.sectionID];}
         [self.notifications[req.bulletin.sectionID] addObject:[req copy]];
         [self.view update];
     }
@@ -83,7 +83,7 @@
     }
 
     if(reqList.count == 0) {
-        [self.notifications removeObjectForKey:req.bulletin.sectionID];
+        @synchronized(self.notifications) {[self.notifications removeObjectForKey:req.bulletin.sectionID];}
         [self.view update];
     
     } else {
@@ -104,7 +104,9 @@
 }
 
 - (void) hideAllNotifications {
-    for(NSString *key in self.notifications) [self hideNotificationAllWithIdentifier:key];
+    @synchronized(self.notifications) {
+        for(NSString *key in self.notifications) [self hideNotificationAllWithIdentifier:key];
+    }
 }
 
 - (void) hideNotificationAllWithIdentifier:(NSString *)identifier {

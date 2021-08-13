@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>entry</key>
+        <dict>
+            <!-- Cell type -->
+            <key>cell</key>
+            <string>PSLinkCell</string>
+
+            <!-- Label -->
+            <key>label</key>
+            <string>Tako</string>
+
+            <!-- Icon -->
+            <!-- <key>icon</key>
+            <string>icon.png</string> -->
+
+            <!-- Controller being loaded -->
+            <key>detail</key>
+            <string>TKORootListController</string>
+            <key>isController</key>
+            <true/>
+
+            <!-- Bundle -->
+            <key>bundle</key>
+            <string>TakoPreferences</string>
+        </dict>
+    </dict>
+</plist>

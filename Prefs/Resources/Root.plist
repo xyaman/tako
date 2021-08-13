@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>items</key>
+        <array>
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Settings</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false/>
+                <key>label</key>
+                <string>Enabled</string>
+                <key>key</key>
+                <string>isEnabled</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Sort nofications apps by</string>
+                <key>footerText</key>
+                <string>No respring required.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSegmentCell</string>
+                <key>validValues</key>
+                <array>
+                    <integer>0</integer>
+                    <integer>1</integer>
+                    <integer>2</integer>
+                </array>
+                <key>validTitles</key>
+                <array>
+                    <string>Count</string>
+                    <string>Bundle Name</string>
+                    <string>None</string>
+                </array>
+                <key>default</key>
+                <integer>0</integer>
+                <key>key</key>
+                <string>sortBy</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
+            </dict>
+            <!-- Other -->
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Other</string>
+            </dict>
+            <dict>
+                <key>cellClass</key>
+                <string>HBTwitterCell</string>
+                <key>label</key>
+                <string>Xyaman</string>
+                <key>user</key>
+                <string>xyamanDEV</string>
+            </dict>
+            <dict>
+                <key>cellClass</key>
+                <string>HBLinkTableCell</string>
+                <key>label</key>
+                <string>Donate me ☕️</string>
+                <key>url</key>
+                <string>https://paypal.me/xyamandev</string>
+            </dict>
+            <dict>
+                <key>cellClass</key>
+                <string>HBLinkTableCell</string>
+                <key>label</key>
+                <string>Source Code ⚙️</string>
+                <key>url</key>
+                <string>https://github.com/xyaman/tako</string>
+            </dict>
+        </array>
+        <key>title</key>
+        <string>Tako</string>
+    </dict>
+</plist>

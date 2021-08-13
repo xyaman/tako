@@ -1,5 +1,6 @@
 #import "TKOView.h"
 #import "TKOController.h"
+#import "objc/runtime.h"
 
 @interface TKOView ()
 @end
@@ -45,6 +46,8 @@
         [self.cellsInfo addObject:[@{@"bundleID": key, @"count":[NSNumber numberWithInteger:bundleNotifs.count]} mutableCopy]];
     }
 
+    // Do ordering
+    [self sortCells];
     [self.colView reloadData];
 }
 
@@ -52,16 +55,38 @@
     
     int index = 0;
 
-    for(NSMutableDictionary *cellInfo in self.cellsInfo) {
-        if([cellInfo[@"bundleID"] isEqualToString:identifier]) {
-            NSArray *bundleNotifs = [TKOController sharedInstance].notifications[identifier];
-            cellInfo[@"count"] = [NSNumber numberWithInteger:bundleNotifs.count];
-            break;
+    @synchronized(self.cellsInfo) {
+        for(NSMutableDictionary *cellInfo in self.cellsInfo) {
+            if([cellInfo[@"bundleID"] isEqualToString:identifier]) {
+                NSArray *bundleNotifs = [TKOController sharedInstance].notifications[identifier];
+                cellInfo[@"count"] = [NSNumber numberWithInteger:bundleNotifs.count];
+                break;
+            }
+            index += 1;
         }
-        index += 1;
-    } 
+    }
 
-    [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
+    // [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"count" ascending:YES], nil]];
+    // NSSortDescriptor *sortByName = [NSSortDescriptor sortDescriptorWithKey:@"count" ascending:NO];
+    // NSArray *sortDescriptors = [NSArray arrayWithObject:sortByName];
+    // self.cellsInfo = [[self.cellsInfo sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
+
+    // [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
+    if(self.sortBy == 0) {
+        [self sortCells];
+        [self.colView reloadData];
+    
+    } else {
+        [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
+    }
+}
+
+- (void) sortCells {
+    // Count
+    if(self.sortBy == 0) [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"count" ascending:NO], nil]];
+
+    // Bundle name
+    else if(self.sortBy == 1) [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"bundleID" ascending:YES], nil]];
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -75,16 +100,10 @@
 
     BOOL isSelected = [info[@"bundleID"] isEqualToString:self.selectedBundle];
 
-    // cell.icon.image = nil;
-    // cell.backgroundColor = [UIColor clearColor];
-
     [cell setBundleIdentifier:info[@"bundleID"]];
     [cell setCount:[info[@"count"] intValue]];
 
-    if(isSelected) {
-        [self.colView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
-        // [self collectionView:self.colView didSelectItemAtIndexPath:indexPath];
-    }
+    if(isSelected) [self.colView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
 
     return cell;
 }
@@ -102,13 +121,16 @@
         return NO;
     }
 
-    // [[TKOController sharedInstance] hideAllNotifications];
+    [[TKOController sharedInstance] hideAllNotifications];
     
     return YES;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
+
+    // When cell is selected, we reset the global timer
+    [[objc_getClass("SBIdleTimerGlobalCoordinator") sharedInstance] resetIdleTimer];
     
     NSDictionary *info = self.cellsInfo[indexPath.item];
     self.selectedBundle = [info[@"bundleID"] copy];
