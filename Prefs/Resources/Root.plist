@@ -54,6 +54,50 @@
                 <key>PostNotification</key>
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false/>
+                <key>label</key>
+                <string>Enabled</string>
+                <key>key</key>
+                <string>isEnabled</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>When NC is opened, select</string>
+                <key>footerText</key>
+                <string>No respring required.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSegmentCell</string>
+                <key>validValues</key>
+                <array>
+                    <integer>0</integer>
+                    <integer>1</integer>
+                    <integer>2</integer>
+                </array>
+                <key>validTitles</key>
+                <array>
+                    <string>Previous</string>
+                    <string>Last App</string>
+                    <string>All Closed</string>
+                </array>
+                <key>default</key>
+                <integer>1</integer>
+                <key>key</key>
+                <string>displayBy</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
+            </dict>
             <!-- Other -->
             <dict>
                 <key>cell</key>

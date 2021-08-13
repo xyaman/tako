@@ -32,7 +32,7 @@
     } else {
         @synchronized(self.notifications) {[self.notifications setObject:[NSMutableArray new] forKey:req.bulletin.sectionID];}
         [self.notifications[req.bulletin.sectionID] addObject:[req copy]];
-        [self.view update];
+        [self.view updateWithNewBundle:req.bulletin.sectionID];
     }
 }
 

@@ -12,6 +12,7 @@ HBPreferences *preferences = nil;
 BOOL isEnabled = NO;
 
 NSNumber *prefSortBy = nil;
+NSNumber *prefDisplayBy = nil;
 
 
 /*----------------------
@@ -40,6 +41,9 @@ NSNumber *prefSortBy = nil;
 @end
 
 @interface NCNotificationListCoalescingControlsCell : UIView
+@end
+
+@interface CSCoverSheetViewController : UIViewController
 @end
 
 @interface CSAdjunctItemView : UIView

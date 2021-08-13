@@ -12,6 +12,7 @@
     
     // Settings
     self.layer.cornerRadius = 13;
+    self.layer.cornerCurve = kCACornerCurveContinuous;
     self.clipsToBounds = YES;
     
     // Blur

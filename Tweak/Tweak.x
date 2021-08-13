@@ -2,10 +2,24 @@
 
 void updatePrefs() {
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
+    [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
     [[TKOController sharedInstance].view.colView reloadData];
 }
 
 %group TakoTweak
+
+%hook CSCoverSheetViewController
+- (void)viewWillAppear:(BOOL)animated {
+    %orig;
+    [[TKOController sharedInstance].view prepareForDisplay];
+}
+
+// - (void)viewWillDisappear:(BOOL)animated {
+//     %orig;
+
+// }
+%end
+
 
 // History notifications
 %hook NCNotificationListSectionHeaderView
@@ -107,7 +121,7 @@ void updatePrefs() {
     self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 80)];;
 
     [TKOController sharedInstance].view = self.tkoView;
-    updatePrefs();
+    updatePrefs(); // Todo check this
 
     [self.stackView insertArrangedSubview:self.tkoView atIndex:0];
 
@@ -142,6 +156,7 @@ void updatePrefs() {
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updatePrefs, (CFStringRef)@"com.xyaman.takopreferences/ReloadPrefs", NULL, (CFNotificationSuspensionBehavior)kNilOptions);
 
     [preferences registerObject:&prefSortBy default:@(0) forKey:@"sortBy"];
+    [preferences registerObject:&prefDisplayBy default:@(1) forKey:@"displayBy"];
 
     updatePrefs();
     %init(TakoTweak);
