@@ -16,28 +16,37 @@
     return sharedInstance;
 }
 
+// Every time a new notification is received, is redirected to here
 - (void) insertNotificationRequest:(NCNotificationRequest *)req {
+    NSString* bundleID = req.bulletin.sectionID;
+    NCNotificationRequest *notif = [req copy];
+    // [self.notifLock lock];
 
-    // If key exists, just add a new item to key (sectionID) array
-    if([self.notifications objectForKey:req.bulletin.sectionID]) {
+    // If key exists just add to our data
+    if([self.notifications objectForKey:bundleID]) {
+        [self.notifications[bundleID] addObject:notif];
 
-        [self.notifications[req.bulletin.sectionID] addObject:[req copy]];
+        // if that bundle is being showed right now, also insert to nlc
+        if([self.view.selectedBundleID isEqualToString:bundleID]) [self insertNotificationToNlc:notif];
 
-        if([self.view.selectedBundle isEqualToString:req.bulletin.sectionID]) [self showNotification:[req copy]]; // Remove copy
-
-        [self.view updateCellWithIdentifier:req.bulletin.sectionID];
-        return;
-
-    // If it doesn't exist, create array, then add item
+        // Also we update only this cell
+        [self.view updateCellWithBundle:bundleID];
+    
+    // Key doesnt exists, we add but we also want to update our view
     } else {
-        @synchronized(self.notifications) {[self.notifications setObject:[NSMutableArray new] forKey:req.bulletin.sectionID];}
-        [self.notifications[req.bulletin.sectionID] addObject:[req copy]];
-        [self.view updateWithNewBundle:req.bulletin.sectionID];
+        [self.notifications setObject:[NSMutableArray new] forKey:bundleID];
+        [self.notifications[bundleID] addObject:notif];
+        [self.view updateAllCells];
+        self.view.lastBundleUpdated = [bundleID copy];
     }
+
+    // [self.notifLock lock] 
 }
 
+
+// Every time a new notification is modified, is redirected to here
 - (void) modifyNotificationRequest:(NCNotificationRequest* )req {
-   
+    
     // If key exists, just add a new item to key (sectionID) array
     if([self.notifications objectForKey:req.bulletin.sectionID]) {
     
@@ -52,72 +61,71 @@
             }
         }
 
-
-    // THIS SHOULDNT HAPPEN. If it doesn't exist, create array, then add item
-    } else {
-        // [self.notifications setObject:[NSMutableArray new] forKey:req.bulletin.sectionID];
-        // [self.notifications[req.bulletin.sectionID] addObject:[req copy]];
-        // [self.view update];
-    } 
-
-    // [self.view update];
+    }
 }
 
+// Every time a new notification is removed, is redirected to here
 - (void) removeNotificationRequest:(NCNotificationRequest *)req {
+    // Here we want to remove from our info but also from the system
+    NSString* bundleID = req.bulletin.sectionID;
 
-    // If key doesn't exist just return
-    // This shouldnt happen, but just in case
-    if(![self.notifications objectForKey:req.bulletin.sectionID]) return;
+    // [self.notifLock lock];
 
-    // Get array
-    NSMutableArray *reqList = self.notifications[req.bulletin.sectionID];
+    // If key exists just add to our data
+    if([self.notifications objectForKey:bundleID]) {
+        // Get array
+        NSMutableArray *bundleNotifs = self.notifications[bundleID];
 
-    // Remove notification from array
-    for (NSInteger i = reqList.count - 1; i >= 0; i--) {
-        NCNotificationRequest* not = reqList[i];
-        if([not.notificationIdentifier isEqualToString:req.notificationIdentifier]) {
-            [self hideNotification:not]; // Remove notification permanently
-            [reqList removeObjectAtIndex:i];
-            break;
+        // Remove notification from array
+        for (NSInteger i = bundleNotifs.count - 1; i >= 0; i--) {
+            if([((NCNotificationRequest *)bundleNotifs[i]).notificationIdentifier isEqualToString:req.notificationIdentifier]) {
+                [self removeNotificationFromNlc:bundleNotifs[i]];
+                [bundleNotifs removeObjectAtIndex:i];
+                break;
+            }
         }
-    }
 
-    if(reqList.count == 0) {
-        @synchronized(self.notifications) {[self.notifications removeObjectForKey:req.bulletin.sectionID];}
-        [self.view update];
+        // Also we update only this cell
+        if(bundleNotifs.count == 0) {
+            [self.notifications removeObjectForKey:bundleID];
+            [self.view updateAllCells];
     
+        } else {
+            [self.view updateCellWithBundle:bundleID];
+        }
+    
+    // THIS SHOULDNT HAPPEN
     } else {
-        [self.view updateCellWithIdentifier:req.bulletin.sectionID];
+        NSLog(@"[TakoTweak] Weird notification removed: %@", req);
+        [self removeNotificationFromNlc:req];
     }
-    
+
+    // [self.notifLock lock] 
+
 }
 
-- (void) showNotificationAllWithIdentifier:(NSString *)identifier {
-    if(![self.notifications objectForKey:identifier]) return;
-    for(NCNotificationRequest *req in self.notifications[identifier]) [self showNotification:req];
-}
-
-- (void) showNotification:(NCNotificationRequest *)req {
+- (void) insertNotificationToNlc:(NCNotificationRequest *)req {
     self.isTkoCall = YES;
     [self.nlc insertNotificationRequest:req];
     self.isTkoCall = NO;
 }
 
-- (void) hideAllNotifications {
-    @synchronized(self.notifications) {
-        for(NSString *key in self.notifications) [self hideNotificationAllWithIdentifier:key];
-    }
+- (void) insertAllNotificationsWithBundleID:(NSString *)bundleID {
+    for(NCNotificationRequest *notif in self.notifications[bundleID]) [self insertNotificationToNlc:notif];
 }
 
-- (void) hideNotificationAllWithIdentifier:(NSString *)identifier {
-    if(![self.notifications objectForKey:identifier]) return;
-    for(NCNotificationRequest *req in self.notifications[identifier]) [self hideNotification:req];
-}
-
-- (void) hideNotification:(NCNotificationRequest *)req {
+- (void) removeNotificationFromNlc:(NCNotificationRequest *)req {
     self.isTkoCall = YES;
     [self.nlc removeNotificationRequest:req];
     self.isTkoCall = NO;
+}
+
+- (void) removeAllNotificationsWithBundleID:(NSString *)bundleID {
+    for(NCNotificationRequest *notif in self.notifications[bundleID]) [self removeNotificationFromNlc:notif];
+}
+
+- (void) removeAllNotifications {
+    for(NSString *bundleID in self.notifications) [self removeAllNotificationsWithBundleID:bundleID];
 }
 
 - (UIImage *) getIconForIdentifier:(NSString *)identifier {
