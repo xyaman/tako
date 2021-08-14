@@ -9,12 +9,11 @@
 - (instancetype) initWithFrame:(CGRect) frame {
     self = [super initWithFrame:frame];
     self.userInteractionEnabled = YES;
-    self.clipsToBounds = YES;
 
     // UICollection layout
     self.colLayout = [UICollectionViewFlowLayout new];
     self.colLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.colLayout.itemSize = CGSizeMake(self.frame.size.height - 20, self.frame.size.height - 10);
+    self.colLayout.itemSize = CGSizeMake(60, 80);
     
     // UICollection
     self.colView = [[UICollectionView alloc]initWithFrame:frame collectionViewLayout:self.colLayout];

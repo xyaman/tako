@@ -3,6 +3,7 @@
 #import <Kuro/libKuro.h>
 
 @interface TKOCell : UICollectionViewCell <UIGestureRecognizerDelegate>
+@property(nonatomic, retain) UIView *closeView;
 @property(nonatomic, retain) UIImageView *icon;
 @property(nonatomic, retain) UILabel *countLabel;
 @property(nonatomic, retain) NSString *identifier;

@@ -135,7 +135,7 @@ void updatePrefs() {
 
     if(self.tkoView) return;
 
-    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 80)];;
+    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, 359, 110)];;
 
     [TKOController sharedInstance].view = self.tkoView;
     updatePrefs(); // Todo check this
