@@ -46,5 +46,12 @@ NSNumber *prefDisplayBy = nil;
 @interface CSCoverSheetViewController : UIViewController
 @end
 
+@interface CSPageViewController : UIViewController
+@end
+
+@interface SBBacklightController : NSObject
+-(void)setBacklightFactorPending:(float)value;
+@end
+
 @interface CSAdjunctItemView : UIView
 @end

@@ -9,6 +9,7 @@
 - (instancetype) initWithFrame:(CGRect) frame {
     self = [super initWithFrame:frame];
     self.userInteractionEnabled = YES;
+    self.clipsToBounds = YES;
 
     // UICollection layout
     self.colLayout = [UICollectionViewFlowLayout new];
@@ -39,6 +40,10 @@
     return CGSizeMake(self.frame.size.width, self.frame.size.height);
 }
 
+// iPad issue
+-(void)setSizeToMimic:(CGSize)arg1 {}
+-(CGSize)sizeToMimic {return self.frame.size;}
+
 - (void) updateAllCells {
     [self.cellsInfo removeAllObjects];
 
@@ -66,8 +71,6 @@
     } else {
         [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:cellIndex inSection:0]]];
     }
-
-    self.lastBundleUpdated = [bundleID copy];
 }
 
 - (void) prepareForDisplay {
@@ -79,37 +82,20 @@
     } else if(self.displayBy == 1) {
 
         if(!self.lastBundleUpdated) {
-            self.selectedBundleID = nil;
-            [[TKOController sharedInstance] removeAllNotifications];
+            // self.selectedBundleID = nil;
+            // [[TKOController sharedInstance] removeAllNotifications];
             [self.colView reloadData];
             return;
         }
         
-        // First we want to hide previous
-        // if(self.selectedBundleID) {
-        //     NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
-        //     [self.colView deselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0] animated:YES];
-        //     [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]]; 
-        //     self.selectedBundleID = nil;
-        //     [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:cellIndex inSection:0]]];
-        // }
-
-        [[TKOController sharedInstance] removeAllNotifications];
-
+        [[TKOController sharedInstance] hideAllNotifications];
         self.selectedBundleID = [self.lastBundleUpdated copy];
-        NSLog(@"[TakoTweak] now selected: %@", self.selectedBundleID);
-
-        // NSInteger cellIndex = [self getCellIndexByBundle:self.lastBundleUpdated];
-        // [self.colView selectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
-        // [self collectionView:self.colView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]]; 
-        // [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:cellIndex inSection:0]]];
         [self.colView reloadData];
 
-        
 
     } else if(self.displayBy == 2) {
         self.selectedBundleID = nil;
-        [[TKOController sharedInstance] removeAllNotifications];
+        [[TKOController sharedInstance] hideAllNotifications];
         [self.colView reloadData];
     }
 }
@@ -171,7 +157,7 @@
     }
 
     // Otherwise we clean all and show
-    [[TKOController sharedInstance] removeAllNotifications];
+    [[TKOController sharedInstance] hideAllNotifications];
     
     return YES;
 }
@@ -190,7 +176,7 @@
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
     // Hide all notifications from the cell that was just deselected
     NSDictionary *info = self.cellsInfo[indexPath.item];
-    [[TKOController sharedInstance] removeAllNotificationsWithBundleID:info[@"bundleID"]];
+    [[TKOController sharedInstance] hideAllNotificationsWithBundleID:info[@"bundleID"]];
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {

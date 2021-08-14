@@ -17,8 +17,9 @@
 - (void) insertAllNotificationsWithBundleID:(NSString *)bundleID;
 
 - (void) removeNotificationFromNlc:(NCNotificationRequest *)req;
+- (void) hideAllNotificationsWithBundleID:(NSString *)bundleID;
 - (void) removeAllNotificationsWithBundleID:(NSString *)bundleID;
-- (void) removeAllNotifications;
+- (void) hideAllNotifications;
 
 
 // NLC

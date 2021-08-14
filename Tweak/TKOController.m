@@ -21,6 +21,7 @@
     NSString* bundleID = req.bulletin.sectionID;
     NCNotificationRequest *notif = [req copy];
     // [self.notifLock lock];
+    self.view.lastBundleUpdated = [bundleID copy];
 
     // If key exists just add to our data
     if([self.notifications objectForKey:bundleID]) {
@@ -37,7 +38,6 @@
         [self.notifications setObject:[NSMutableArray new] forKey:bundleID];
         [self.notifications[bundleID] addObject:notif];
         [self.view updateAllCells];
-        self.view.lastBundleUpdated = [bundleID copy];
     }
 
     // [self.notifLock lock] 
@@ -120,12 +120,21 @@
     self.isTkoCall = NO;
 }
 
-- (void) removeAllNotificationsWithBundleID:(NSString *)bundleID {
+- (void) hideAllNotificationsWithBundleID:(NSString *)bundleID {
     for(NCNotificationRequest *notif in self.notifications[bundleID]) [self removeNotificationFromNlc:notif];
 }
 
-- (void) removeAllNotifications {
-    for(NSString *bundleID in self.notifications) [self removeAllNotificationsWithBundleID:bundleID];
+- (void) removeAllNotificationsWithBundleID:(NSString *)bundleID {
+    for(NCNotificationRequest *notif in self.notifications[bundleID]) [self removeNotificationFromNlc:notif];
+    [self.notifications removeObjectForKey:bundleID];
+    if([self.view.selectedBundleID isEqualToString:bundleID]) self.view.selectedBundleID = nil;
+
+
+    [self.view updateAllCells];
+}
+
+- (void) hideAllNotifications {
+    for(NSString *bundleID in self.notifications) [self hideAllNotificationsWithBundleID:bundleID];
 }
 
 - (UIImage *) getIconForIdentifier:(NSString *)identifier {

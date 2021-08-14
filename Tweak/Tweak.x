@@ -8,16 +8,33 @@ void updatePrefs() {
 
 %group TakoTweak
 
-%hook CSCoverSheetViewController
-- (void)viewWillAppear:(BOOL)animated {
-    %orig;
-    [[TKOController sharedInstance].view prepareForDisplay];
-}
+// %hook CSCoverSheetViewController
+// - (void)viewWillAppear:(BOOL)animated {
+//     %orig;
+//     [[TKOController sharedInstance].view prepareForDisplay];
+// }
 
 // - (void)viewWillDisappear:(BOOL)animated {
 //     %orig;
 
 // }
+// %end
+
+%hook CSPageViewController
+-(void)viewWillAppear:(BOOL)animated {
+    %orig;
+    [[TKOController sharedInstance].view prepareForDisplay];
+}
+%end
+
+%hook SBBacklightController
+-(void)setBacklightFactorPending:(float)value {
+    %orig;
+    // Screen is on
+    if(value > 0.0f) {
+        [[TKOController sharedInstance].view prepareForDisplay];
+    }
+}
 %end
 
 
