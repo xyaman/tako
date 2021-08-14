@@ -12,6 +12,9 @@
 @property(nonatomic, retain) NCNotificationStructuredListViewController *nlc;
 @property(nonatomic) BOOL isTkoCall;
 
+// Customization
+@property(nonatomic, retain) NSNumber *cellStyle;
+
 + (TKOController *) sharedInstance;
 - (void) insertNotificationToNlc:(NCNotificationRequest *)req;
 - (void) insertAllNotificationsWithBundleID:(NSString *)bundleID;

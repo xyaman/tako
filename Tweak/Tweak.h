@@ -14,6 +14,9 @@ BOOL isEnabled = NO;
 NSNumber *prefSortBy = nil;
 NSNumber *prefDisplayBy = nil;
 
+// Cell
+NSNumber *prefCellStyle = nil;
+
 
 /*----------------------
  / Class definitions

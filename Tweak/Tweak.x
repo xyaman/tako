@@ -1,6 +1,8 @@
 #import "Tweak.h"
 
 void updatePrefs() {
+    [TKOController sharedInstance].cellStyle = prefCellStyle;
+
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
     [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
     [[TKOController sharedInstance].view.colView reloadData];
@@ -135,7 +137,15 @@ void updatePrefs() {
 
     if(self.tkoView) return;
 
-    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, 359, 110)];;
+    float height = 0;
+
+    if([prefCellStyle intValue] == 0) {
+        height = 110;
+    } else if([prefCellStyle intValue] == 1) {
+        height = 65;
+    }
+
+    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, 359, height)];
 
     [TKOController sharedInstance].view = self.tkoView;
     updatePrefs(); // Todo check this
@@ -174,6 +184,9 @@ void updatePrefs() {
 
     [preferences registerObject:&prefSortBy default:@(0) forKey:@"sortBy"];
     [preferences registerObject:&prefDisplayBy default:@(1) forKey:@"displayBy"];
+
+    // Cells
+    [preferences registerObject:&prefCellStyle default:@(0) forKey:@"cellStyle"];
 
     updatePrefs();
     %init(TakoTweak);

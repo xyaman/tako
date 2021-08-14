@@ -13,7 +13,9 @@
     // UICollection layout
     self.colLayout = [UICollectionViewFlowLayout new];
     self.colLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.colLayout.itemSize = CGSizeMake(60, 80);
+
+    if([[TKOController sharedInstance].cellStyle intValue] == 0) self.colLayout.itemSize = CGSizeMake(60, 80);
+    else if([[TKOController sharedInstance].cellStyle intValue] == 1) self.colLayout.itemSize = CGSizeMake(58, 33);
     
     // UICollection
     self.colView = [[UICollectionView alloc]initWithFrame:frame collectionViewLayout:self.colLayout];
@@ -31,6 +33,9 @@
     // Current cell list info
     self.cellsInfo = [NSMutableArray new];
     self.selectedBundleID = nil;
+
+    // Other
+    self.selectionFeedback = [[UISelectionFeedbackGenerator alloc] init];
 
     return self;
 }
@@ -58,7 +63,7 @@
 - (void) updateCellWithBundle:(NSString *)bundleID {
 
     NSInteger cellIndex = [self getCellIndexByBundle:bundleID];
-     __weak NSArray *bundle = [TKOController sharedInstance].notifications[bundleID];
+    __weak NSArray *bundle = [TKOController sharedInstance].notifications[bundleID];
     self.cellsInfo[cellIndex][@"count"] = [NSNumber numberWithInteger:bundle.count];
 
     // If we are sorting by notification count, we need to update all cells again
@@ -143,6 +148,7 @@
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
+    [self.selectionFeedback selectionChanged];
 
     NSDictionary *info = self.cellsInfo[indexPath.item]; 
     BOOL isSelected = [info[@"bundleID"] isEqualToString:self.selectedBundleID];

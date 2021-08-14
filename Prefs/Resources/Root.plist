@@ -22,6 +22,39 @@
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
             </dict>
+
+            <!-- Cell style -->
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Sort nofications apps by</string>
+                <key>footerText</key>
+                <string>Respring required.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSegmentCell</string>
+                <key>validValues</key>
+                <array>
+                    <integer>0</integer>
+                    <integer>1</integer>
+                </array>
+                <key>validTitles</key>
+                <array>
+                    <string>Tako ugly for now</string>
+                    <string>Axon grouped style</string>
+                </array>
+                <key>default</key>
+                <integer>0</integer>
+                <key>key</key>
+                <string>cellStyle</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+
+
+            <!-- Sort by -->
             <dict>
                 <key>cell</key>
                 <string>PSGroupCell</string>

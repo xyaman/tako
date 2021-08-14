@@ -3,56 +3,20 @@
 #import "objc/runtime.h"
 
 @interface TKOCell ()
-@property(nonatomic, retain) UIPanGestureRecognizer *pan;
-@property(nonatomic) CGRect initialFrame;
-@property(nonatomic) BOOL willBeRemoved;
-@property(nonatomic, retain) UINotificationFeedbackGenerator *taptic;
-
-// Close option fill
-@property(nonatomic) CAShapeLayer *shapeLayer;
 @end
 
 @implementation TKOCell
-
 - (id) initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    
-    // Settings
     self.layer.cornerRadius = 13;
-    
-    // Blur
     self.backgroundColor = [UIColor clearColor];
 
-    UIView *blur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
-    blur.frame = self.bounds;
-    blur.layer.cornerRadius = 13;
-    blur.layer.cornerCurve = kCACornerCurveContinuous;
-    [self addSubview:blur];
-
-    // Notification app icon
-    self.icon = [UIImageView new];
-    self.icon.userInteractionEnabled = NO;
-    [self addSubview:self.icon];
-
-    self.icon.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.icon.topAnchor constraintEqualToAnchor:self.topAnchor constant:5].active = YES;
-    [self.icon.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [self.icon.heightAnchor constraintEqualToConstant:30].active = YES;
-    [self.icon.widthAnchor constraintEqualToConstant:30].active = YES;
-
-    // Notification count
-    self.countLabel = [UILabel new];
-    self.countLabel.userInteractionEnabled = NO;
-    [self addSubview:self.countLabel];
-
-    self.countLabel.textAlignment = NSTextAlignmentCenter;
-
-    self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.countLabel.topAnchor constraintEqualToAnchor:self.icon.bottomAnchor].active = YES;
-    [self.countLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-    [self.countLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [self.countLabel.widthAnchor constraintEqualToConstant:self.frame.size.width].active = YES;
-
+    // View blur
+    self.blur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
+    self.blur.frame = self.bounds;
+    self.blur.layer.cornerRadius = 13;
+    self.blur.layer.cornerCurve = kCACornerCurveContinuous;
+    [self addSubview:self.blur];
 
     // Close view
     self.closeView = [UIView new];
@@ -62,57 +26,180 @@
     [self addSubview:self.closeView];
 
     self.closeView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.closeView.bottomAnchor constraintEqualToAnchor:blur.topAnchor constant:-4].active = YES;
+    [self.closeView.bottomAnchor constraintEqualToAnchor:self.blur.topAnchor constant:-4].active = YES;
     [self.closeView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [self.closeView.heightAnchor constraintEqualToConstant:20].active = YES;
-    [self.closeView.widthAnchor constraintEqualToConstant:20].active = YES;;
+    [self.closeView.widthAnchor constraintEqualToConstant:20].active = YES;
     [self layoutIfNeeded];
 
-    // self.closeView = [UIImageView new];
-    // self.closeView.image = [UIImage systemImageNamed:@"xmark.circle"];
-    // self.closeView.tintColor = [UICol
+    // Close blur
+    UIView *closeBlur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
+    closeBlur.frame = self.closeView.bounds;
+    closeBlur.layer.cornerRadius = 13;
+    closeBlur.layer.cornerCurve = kCACornerCurveContinuous;
+    [self.closeView addSubview:closeBlur];
 
-    UIView *blur2 = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
-    blur2.frame = self.closeView.bounds;
-    blur2.layer.cornerRadius = 13;
-    blur2.layer.cornerCurve = kCACornerCurveContinuous;
-    [self.closeView addSubview:blur2];
-
-    UILabel *X = [UILabel new];
-    X.textAlignment = NSTextAlignmentCenter;
-    X.backgroundColor = [UIColor clearColor];
-    X.frame = self.closeView.bounds;
-    X.text = @"x";
-    X.font = [UIFont systemFontOfSize:10];
-    [self.closeView addSubview:X];
+    // Close label
+    UILabel *closeText = [UILabel new];
+    closeText.textAlignment = NSTextAlignmentCenter;
+    closeText.backgroundColor = [UIColor clearColor];
+    closeText.frame = self.closeView.bounds;
+    closeText.text = @"x";
+    closeText.font = [UIFont systemFontOfSize:10];
+    [self.closeView addSubview:closeText];
     
-    self.shapeLayer = [CAShapeLayer layer];
-    self.shapeLayer.fillColor = [UIColor clearColor].CGColor;
-    self.shapeLayer.strokeColor = [UIColor whiteColor].CGColor;
-    self.shapeLayer.lineCap = kCALineCapRound;
-
-    self.shapeLayer.lineWidth = 2;
-    self.shapeLayer.strokeEnd = 0;
+    // Close shape
+    self.closeShapeLayer = [CAShapeLayer layer];
+    self.closeShapeLayer.fillColor = [UIColor clearColor].CGColor;
+    self.closeShapeLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.closeShapeLayer.lineCap = kCALineCapRound;
+    self.closeShapeLayer.lineWidth = 2;
+    self.closeShapeLayer.strokeEnd = 0;
     
-    self.shapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.closeView.center radius:10 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
+    self.closeShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.closeView.center radius:10 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
+    [self.layer addSublayer:self.closeShapeLayer];
 
-    [self.layer addSublayer:self.shapeLayer];
-    
 
     // Pan gesture
-    self.pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-    [self addGestureRecognizer:self.pan];
+    self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    [self addGestureRecognizer:self.panGesture];
 
-    self.pan.delegate = self;
+    self.panGesture.delegate = self;
     self.taptic = [[UINotificationFeedbackGenerator alloc] init];
     self.willBeRemoved = NO;
-    
+
+    // Setup style
+    if([[TKOController sharedInstance].cellStyle intValue] == 0) [self setupUgly];
+    else if([[TKOController sharedInstance].cellStyle intValue] == 1) [self setupAxonStyle];
+
     return self;
 }
 
+- (void) setupUgly {
+    
+    // Notification app icon
+    self.iconView = [UIImageView new];
+    self.iconView.userInteractionEnabled = NO;
+    [self addSubview:self.iconView];
+
+    self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.iconView.topAnchor constraintEqualToAnchor:self.topAnchor constant:5].active = YES;
+    [self.iconView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [self.iconView.heightAnchor constraintEqualToConstant:30].active = YES;
+    [self.iconView.widthAnchor constraintEqualToConstant:30].active = YES;
+
+    // Notification count
+    self.countLabel = [UILabel new];
+    self.countLabel.userInteractionEnabled = NO;
+    [self addSubview:self.countLabel];
+
+    self.countLabel.textAlignment = NSTextAlignmentCenter;
+
+    self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.countLabel.topAnchor constraintEqualToAnchor:self.iconView.bottomAnchor].active = YES;
+    [self.countLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+    [self.countLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [self.countLabel.widthAnchor constraintEqualToConstant:self.frame.size.width].active = YES;
+}
+
+- (void) setupAxonStyle {
+
+    self.layer.cornerRadius = 16;
+    self.blur.layer.cornerRadius = 16;
+
+    // Notification app icon
+    self.iconView = [UIImageView new];
+    self.iconView.userInteractionEnabled = NO;
+    [self addSubview:self.iconView];
+
+    self.iconView.layer.cornerRadius = 10;
+    self.iconView.layer.cornerCurve = kCACornerCurveContinuous;
+    self.iconView.clipsToBounds = YES;
+
+    self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:6].active = YES;
+    [self.iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [self.iconView.heightAnchor constraintEqualToConstant:20].active = YES;
+    [self.iconView.widthAnchor constraintEqualToConstant:20].active = YES;
+
+    // Notification count
+    self.countLabel = [UILabel new];
+    self.countLabel.userInteractionEnabled = NO;
+    [self addSubview:self.countLabel];
+
+    self.countLabel.textAlignment = NSTextAlignmentCenter;
+    self.countLabel.clipsToBounds = YES;
+    self.countLabel.font = [UIFont systemFontOfSize:10];
+
+    self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.countLabel.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-6].active = YES;
+    [self.countLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [self.countLabel.heightAnchor constraintEqualToConstant:20].active = YES;
+    [self.countLabel.widthAnchor constraintEqualToConstant:20].active = YES;
+    [self layoutIfNeeded];
+
+    self.countLabel.layer.cornerRadius = self.countLabel.frame.size.width / 2;
+    self.countLabel.layer.cornerCurve = kCACornerCurveContinuous;
+}
+
+- (void) prepareForReuse {
+    [super prepareForReuse];
+    self.iconView.image = nil;
+    self.backgroundColor = [UIColor clearColor];
+    self.countLabel.backgroundColor = [UIColor clearColor];
+    self.bundleID = nil;
+}
+
+- (void) setBundleIdentifier:(NSString *)bundleID {
+    self.bundleID = bundleID;
+    UIImage *appIcon = [[[TKOController sharedInstance] getIconForIdentifier:bundleID] copy];
+    UIColor *appColor = [Kuro getPrimaryColor:appIcon];
+    // self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
+    // self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor];
+
+    // Axon version
+    if([[TKOController sharedInstance].cellStyle intValue] == 1) {
+        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(20, 20)];
+        UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext){[appIcon drawInRect:(CGRect) {.origin = CGPointZero, .size = CGSizeMake(20, 20)}];}];
+        self.iconView.image = [image imageWithRenderingMode:appIcon.renderingMode];
+
+        self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
+        self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor];
+
+    } else {
+        self.iconView.image = appIcon ?: [UIImage new];
+    }
+
+}
+
+- (void) setCount:(NSInteger) count {
+    self.countLabel.text = [NSString stringWithFormat:@"%ld", count];
+}
+
+- (void) setSelected:(BOOL)selected {
+    [super setSelected:selected];
+
+    if(selected) {
+        self.backgroundColor = [Kuro getPrimaryColor:self.iconView.image];
+    } else {
+        self.backgroundColor = [UIColor clearColor];
+    }
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    [[objc_getClass("SBIdleTimerGlobalCoordinator") sharedInstance] resetIdleTimer];
+    if(gestureRecognizer != self.panGesture) return YES;
+
+    CGPoint velocity = [self.panGesture velocityInView:self];
+    return fabs(velocity.y) > fabs(velocity.x);
+}
+
+// - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+//     return NO;
+// }
+
 - (void) handlePan:(UIPanGestureRecognizer *)gesture {
     CGPoint translation = [gesture translationInView:self];
-    // CGFloat yDistance = self.frame.origin.y - self.initialFrame.origin.y;
 
     CGFloat movement = translation.y > 0 ? pow(translation.y, 0.7) : -pow(-translation.y, 0.7);
 
@@ -125,13 +212,13 @@
             
         case UIGestureRecognizerStateChanged:
             self.frame = CGRectMake(self.initialFrame.origin.x, movement, self.frame.size.width, self.frame.size.height);
-            self.shapeLayer.strokeEnd = movement >= self.frame.size.height / 3 ? 1 : movement / (self.frame.size.height / 3);
+            self.closeShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / (30);
             
-            if(movement >= self.frame.size.height / 3 && !self.willBeRemoved) {
+            if(movement >= 30 && !self.willBeRemoved) {
                 self.willBeRemoved = YES;
                 // [self.taptic notificationOccurred:UINotificationFeedbackTypeWarning];
             
-            } else if(movement < self.frame.size.height / 3) {
+            } else if(movement < 30) {
                 self.willBeRemoved = NO;
             }
             
@@ -145,62 +232,16 @@
             } else {
                 [self.taptic notificationOccurred:UINotificationFeedbackTypeError];
             }
-            self.frame = self.initialFrame;
-            self.shapeLayer.strokeEnd = 0;
+            self.closeShapeLayer.strokeEnd = 0;
             self.closeView.hidden = YES;
+            self.frame = self.initialFrame;
             break;
             
         default:
-            self.frame = self.initialFrame;
-            self.shapeLayer.strokeEnd = 0;
+            self.closeShapeLayer.strokeEnd = 0;
             self.closeView.hidden = YES;
+            self.frame = self.initialFrame;
             break;
     }
 }
-
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    [[objc_getClass("SBIdleTimerGlobalCoordinator") sharedInstance] resetIdleTimer];
-    if(gestureRecognizer != self.pan) return YES;
-
-    CGPoint velocity = [self.pan velocityInView:self];
-    return fabs(velocity.y) > fabs(velocity.x);
-}
-
-// - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-//     // CGPoint velocity = [self.pan velocityInView:self];
-//     // return fabs(velocity.y) > fabs(velocity.x);
-//     return YES;
-// }
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return NO;
-}
-
-- (void) prepareForReuse {
-    [super prepareForReuse];
-    self.icon.image = nil;
-    self.backgroundColor = [UIColor clearColor];
-    self.bundleID = nil;
-}
-
-- (void) setBundleIdentifier:(NSString *)identifier {
-    self.bundleID = identifier;
-    UIImage *appIcon = [[[TKOController sharedInstance] getIconForIdentifier:identifier] copy];
-    self.icon.image = appIcon ?: [UIImage new];
-}
-
-- (void) setCount:(NSInteger) count {
-    self.countLabel.text = [NSString stringWithFormat:@"%ld", count];
-}
-
-- (void) setSelected:(BOOL)selected {
-    [super setSelected:selected];
-
-    if(selected) {
-        self.backgroundColor = [Kuro getPrimaryColor:self.icon.image];
-    } else {
-        self.backgroundColor = [UIColor clearColor];
-    }
-}
-
 @end
