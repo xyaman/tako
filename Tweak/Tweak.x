@@ -5,6 +5,7 @@ void updatePrefs() {
 
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
     [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
+    [TKOController sharedInstance].view.colView.pagingEnabled = prefUsePaging;
     [[TKOController sharedInstance].view.colView reloadData];
 }
 
@@ -98,6 +99,20 @@ void updatePrefs() {
 }
 %end
 
+%hook SBNCNotificationDispatcher
+-(id)init {
+    %orig;
+    [TKOController sharedInstance].dispatcher = self.dispatcher;
+    return self;
+}
+
+-(void)setDispatcher:(NCNotificationDispatcher *)arg1 {
+    %orig;
+    [TKOController sharedInstance].dispatcher = arg1;
+}
+
+%end
+
 %hook NCNotificationStructuredListViewController
 - (id) init {
     id orig = %orig;
@@ -136,32 +151,29 @@ void updatePrefs() {
     %orig;
 
     if(self.tkoView) return;
+    self.stackView.alignment = UIStackViewAlignmentCenter;
+    self.stackView.distribution = UIStackViewDistributionFillProportionally;
 
-    float height = 0;
+    CGFloat height = 0;
+    CGFloat width = [[UIScreen mainScreen] bounds].size.width - 20;
 
-    if([prefCellStyle intValue] == 0) {
-        height = 110;
-    } else if([prefCellStyle intValue] == 1) {
-        height = 65;
-    }
+    if([prefCellStyle intValue] == 0)  height = 110; // Default
+    else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
 
-    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, 359, height)];
-
-    [TKOController sharedInstance].view = self.tkoView;
+    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
     updatePrefs(); // Todo check this
-
-    [self.stackView insertArrangedSubview:self.tkoView atIndex:0];
-
-    // [self.stackView setCustomSpacing:10 afterView:self.tkoView];
+    [TKOController sharedInstance].view = self.tkoView;
+    [self.stackView addArrangedSubview:self.tkoView];
 }
 
--(void)_insertItem:(id)arg0 animated:(BOOL)arg1 {
+-(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
     %orig;
 
     [self.tkoView removeFromSuperview];
     // [self.stackView addSubview:self.tkoView];
     [self.stackView addArrangedSubview:self.tkoView];
 }
+
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
@@ -184,6 +196,9 @@ void updatePrefs() {
 
     [preferences registerObject:&prefSortBy default:@(0) forKey:@"sortBy"];
     [preferences registerObject:&prefDisplayBy default:@(1) forKey:@"displayBy"];
+
+    // Scroll
+    [preferences registerBool:&prefUsePaging default:NO forKey:@"usePaging"];
 
     // Cells
     [preferences registerObject:&prefCellStyle default:@(0) forKey:@"cellStyle"];

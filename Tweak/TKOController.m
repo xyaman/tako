@@ -20,6 +20,7 @@
 - (void) insertNotificationRequest:(NCNotificationRequest *)req {
     NSString* bundleID = req.bulletin.sectionID;
     NCNotificationRequest *notif = [req copy];
+
     // [self.notifLock lock];
     self.view.lastBundleUpdated = [bundleID copy];
 
@@ -125,7 +126,7 @@
 }
 
 - (void) removeAllNotificationsWithBundleID:(NSString *)bundleID {
-    for(NCNotificationRequest *notif in self.notifications[bundleID]) [self removeNotificationFromNlc:notif];
+    [self.dispatcher destination:nil requestsClearingNotificationRequests:self.notifications[bundleID]];
     [self.notifications removeObjectForKey:bundleID];
     if([self.view.selectedBundleID isEqualToString:bundleID]) self.view.selectedBundleID = nil;
 

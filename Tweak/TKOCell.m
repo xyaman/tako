@@ -208,11 +208,12 @@
             self.initialFrame = self.frame;
             self.willBeRemoved = NO;
             self.closeView.hidden = NO;
+            [self.layer addSublayer:self.closeShapeLayer];
             break;
             
         case UIGestureRecognizerStateChanged:
-            self.frame = CGRectMake(self.initialFrame.origin.x, movement, self.frame.size.width, self.frame.size.height);
-            self.closeShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / (30);
+            self.frame = CGRectMake(self.initialFrame.origin.x, self.initialFrame.origin.y + movement, self.frame.size.width, self.frame.size.height);
+            self.closeShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / 30;
             
             if(movement >= 30 && !self.willBeRemoved) {
                 self.willBeRemoved = YES;
@@ -232,14 +233,16 @@
             } else {
                 [self.taptic notificationOccurred:UINotificationFeedbackTypeError];
             }
-            self.closeShapeLayer.strokeEnd = 0;
+            [self.closeShapeLayer removeFromSuperlayer];
             self.closeView.hidden = YES;
+            self.closeShapeLayer.strokeEnd = 0;
             self.frame = self.initialFrame;
             break;
             
         default:
-            self.closeShapeLayer.strokeEnd = 0;
             self.closeView.hidden = YES;
+            [self.closeShapeLayer removeFromSuperlayer];
+            self.closeShapeLayer.strokeEnd = 0;
             self.frame = self.initialFrame;
             break;
     }

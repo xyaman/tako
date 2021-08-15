@@ -17,6 +17,15 @@
 -(void)removeNotificationRequest:(NCNotificationRequest *)arg1;
 @end
 
+@interface NCNotificationDispatcher : NSObject
+-(void)removeNotificationSectionWithIdentifier:(id)arg0;
+-(void)destination:(id)arg0 requestsClearingNotificationRequests:(id)arg1 ;
+@end
+
+@interface SBNCNotificationDispatcher : NSObject
+@property (nonatomic,retain) NCNotificationDispatcher * dispatcher; 
+@end
+
 struct SBIconImageInfo {
    CGFloat width;
    CGFloat height;

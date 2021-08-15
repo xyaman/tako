@@ -10,6 +10,7 @@
 
 // Notification list controller
 @property(nonatomic, retain) NCNotificationStructuredListViewController *nlc;
+@property(nonatomic, retain) NCNotificationDispatcher *dispatcher;
 @property(nonatomic) BOOL isTkoCall;
 
 // Customization

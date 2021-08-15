@@ -24,6 +24,7 @@
     self.colView.dataSource = self;
     self.colView.backgroundColor = [UIColor clearColor];
     self.colView.showsHorizontalScrollIndicator = NO;
+    self.colView.automaticallyAdjustsScrollIndicatorInsets = NO;
     // self.colView.pagingEnabled = YES;
 
     // Register TKOCell
@@ -190,7 +191,6 @@
     CGFloat cellWidth = self.colLayout.itemSize.width + itemSpacing;
     UIEdgeInsets insets = self.colLayout.sectionInset;
 
-
     // Make sure to remove the last item spacing or it will
     // miscalculate the actual total width.
     CGFloat totalCellWidth = (cellWidth * self.cellsInfo.count) - itemSpacing;
@@ -204,7 +204,7 @@
 
 
     // Calculate the right amount of padding to center the cells.
-    CGFloat padding = ((contentWidth - totalCellWidth) / 2.0) - itemSpacing/2;
+    CGFloat padding = ((contentWidth - totalCellWidth) / 2.0);
     insets.left = padding;
     insets.right = padding;
     return insets;

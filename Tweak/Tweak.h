@@ -14,6 +14,9 @@ BOOL isEnabled = NO;
 NSNumber *prefSortBy = nil;
 NSNumber *prefDisplayBy = nil;
 
+// Scrolling
+BOOL prefUsePaging = NO;
+
 // Cell
 NSNumber *prefCellStyle = nil;
 
@@ -21,6 +24,10 @@ NSNumber *prefCellStyle = nil;
 /*----------------------
  / Class definitions
  -----------------------*/
+@interface UIView (Private)
+- (void) _updateSizeToMimic;
+@end
+
 @interface CSNotificationAdjunctListViewController : UIViewController
 @property(nonatomic, retain) UIStackView *stackView;
 @property(nonatomic, retain) TKOView *tkoView;
