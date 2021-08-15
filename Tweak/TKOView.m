@@ -18,7 +18,7 @@
     else if([[TKOController sharedInstance].cellStyle intValue] == 1) self.colLayout.itemSize = CGSizeMake(58, 33);
     
     // UICollection
-    self.colView = [[UICollectionView alloc]initWithFrame:frame collectionViewLayout:self.colLayout];
+    self.colView = [[UICollectionView alloc]initWithFrame:CGRectZero collectionViewLayout:self.colLayout];
     self.colView.clipsToBounds = YES;
     self.colView.delegate = self;
     self.colView.dataSource = self;
@@ -30,6 +30,15 @@
     // Register TKOCell
     [self.colView registerClass:[TKOCell class] forCellWithReuseIdentifier:@"TKOCell"];
     [self addSubview:self.colView];
+
+    self.colView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.colView.leftAnchor constraintEqualToAnchor:self.leftAnchor].active = YES;
+    [self.colView.rightAnchor constraintEqualToAnchor:self.rightAnchor].active = YES;
+    [self.colView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [self.colView.heightAnchor constraintEqualToConstant:self.frame.size.height].active = YES;
+
+    // [self setNeedsLayout];
+    // [self layoutIfNeeded];
 
     // Current cell list info
     self.cellsInfo = [NSMutableArray new];
@@ -50,12 +59,7 @@
 -(CGSize)sizeToMimic {return self.frame.size;}
 
 - (void) updateAllCells {
-    [self.cellsInfo removeAllObjects];
-
-    for(NSString* bundleID in [TKOController sharedInstance].notifications) {
-        __weak NSArray *bundle = [TKOController sharedInstance].notifications[bundleID];
-        [self.cellsInfo addObject:[@{@"bundleID": bundleID, @"count":[NSNumber numberWithInteger:bundle.count]} mutableCopy]];
-    } 
+    self.cellsInfo = [[TKOController sharedInstance].bundles mutableCopy];
 
     [self sortCells];
     [self.colView reloadData];
@@ -64,8 +68,6 @@
 - (void) updateCellWithBundle:(NSString *)bundleID {
 
     NSInteger cellIndex = [self getCellIndexByBundle:bundleID];
-    __weak NSArray *bundle = [TKOController sharedInstance].notifications[bundleID];
-    self.cellsInfo[cellIndex][@"count"] = [NSNumber numberWithInteger:bundle.count];
 
     // If we are sorting by notification count, we need to update all cells again
     if(self.sortBy == 0) {
@@ -84,19 +86,11 @@
     if(self.displayBy == 0) {
         // Do nothing
     
-    } else if(self.displayBy == 1) {
+    } else if(self.displayBy == 1 && self.lastBundleUpdated) {
 
-        if(!self.lastBundleUpdated) {
-            // self.selectedBundleID = nil;
-            // [[TKOController sharedInstance] removeAllNotifications];
-            [self.colView reloadData];
-            return;
-        }
-        
         [[TKOController sharedInstance] hideAllNotifications];
         self.selectedBundleID = [self.lastBundleUpdated copy];
         [self.colView reloadData];
-
 
     } else if(self.displayBy == 2) {
         self.selectedBundleID = nil;
@@ -107,17 +101,27 @@
 
 - (void) sortCells {
     // Count
-    if(self.sortBy == 0) [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"count" ascending:NO], nil]];
+    if(self.sortBy == 0 && self.cellsInfo.count > 1) {
+        [self.cellsInfo sortUsingComparator:^NSComparisonResult(TKOBundle *a, TKOBundle *b) {
+            return [b.lastUpdate compare:a.lastUpdate];
+        }];
+    
+    } else if(self.sortBy == 1 && self.cellsInfo.count > 1) {
+        [self.cellsInfo sortUsingComparator:^NSComparisonResult(TKOBundle *a, TKOBundle *b) {
+            return [b.ID compare:a.ID];
+        }];
+    }
 
-    // Bundle name
-    else if(self.sortBy == 1) [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"bundleID" ascending:YES], nil]];
+    
+    // // Bundle name
+    // else if(self.sortBy == 1 && self.cellsInfo.count > 1) [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"bundleID" ascending:YES], nil]];
 }
 
 
 - (NSInteger) getCellIndexByBundle:(NSString *)bundleID {
 
     for(NSInteger i = self.cellsInfo.count - 1; i >= 0; i--) {
-        if([self.cellsInfo[i][@"bundleID"] isEqualToString:bundleID]) return i;
+        if([((TKOBundle*)self.cellsInfo[i]).ID isEqualToString:bundleID]) return i;
     }
 
     return -1;
@@ -130,13 +134,13 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     TKOCell *cell = [self.colView dequeueReusableCellWithReuseIdentifier:@"TKOCell" forIndexPath:indexPath];
-    NSDictionary *info = self.cellsInfo[indexPath.item]; 
+    TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
 
-    BOOL isSelected = [info[@"bundleID"] isEqualToString:self.selectedBundleID];
+    BOOL isSelected = [bundle.ID isEqualToString:self.selectedBundleID];
 
-    [cell setBundleIdentifier:info[@"bundleID"]];
-    [cell setCount:[info[@"count"] intValue]];
+    cell.bundle = bundle;
     [cell setSelected:NO];
+    [cell updateColors];
 
     if(isSelected) {
         [cell setSelected:YES];
@@ -151,8 +155,10 @@
     // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
     [self.selectionFeedback selectionChanged];
 
-    NSDictionary *info = self.cellsInfo[indexPath.item]; 
-    BOOL isSelected = [info[@"bundleID"] isEqualToString:self.selectedBundleID];
+    TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
+    BOOL isSelected = [bundle.ID isEqualToString:self.selectedBundleID];
+
+    self.lastBundleUpdated = nil;
     
     // We unselect and prevent from being selected
     if(isSelected) {
@@ -171,18 +177,17 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // When cell is selected, we reset the global timer, so the screen is not turned off
     [[objc_getClass("SBIdleTimerGlobalCoordinator") sharedInstance] resetIdleTimer];
-    self.lastBundleUpdated = nil;
 
     // We get cell bundleID and show all notifications for that bundle
-    NSDictionary *info = self.cellsInfo[indexPath.item];
-    self.selectedBundleID = [info[@"bundleID"] copy];
-    [[TKOController sharedInstance] insertAllNotificationsWithBundleID:info[@"bundleID"]];
+    TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
+    self.selectedBundleID = [bundle.ID copy];
+    [[TKOController sharedInstance] insertAllNotificationsWithBundleID:bundle.ID];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
     // Hide all notifications from the cell that was just deselected
-    NSDictionary *info = self.cellsInfo[indexPath.item];
-    [[TKOController sharedInstance] hideAllNotificationsWithBundleID:info[@"bundleID"]];
+    TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
+    [[TKOController sharedInstance] hideAllNotificationsWithBundleID:bundle.ID];
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {

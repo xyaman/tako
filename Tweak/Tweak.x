@@ -152,7 +152,7 @@ void updatePrefs() {
 
     if(self.tkoView) return;
     self.stackView.alignment = UIStackViewAlignmentCenter;
-    self.stackView.distribution = UIStackViewDistributionFillProportionally;
+    // self.stackView.distribution = UIStackViewDistributionFillProportionally;
 
     CGFloat height = 0;
     CGFloat width = [[UIScreen mainScreen] bounds].size.width - 20;

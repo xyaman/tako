@@ -1,3 +1,5 @@
+#import <UIKit/UIKit.h>
+
 @interface BBBulletin : NSObject
 @property(copy, nonatomic) NSString *title;
 @property(copy, nonatomic) NSString *sectionID;

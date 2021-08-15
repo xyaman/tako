@@ -3,9 +3,10 @@
 
 #import "CommonHeaders.h"
 #import "TKOView.h"
+#import "TKOBundle.h"
 
 @interface TKOController : NSObject
-@property(nonatomic, retain) NSMutableDictionary *notifications;
+@property(nonatomic, retain) NSMutableArray *bundles;
 @property(nonatomic, retain) TKOView *view;
 
 // Notification list controller
@@ -30,6 +31,4 @@
 - (void) insertNotificationRequest:(NCNotificationRequest *)req;
 - (void) modifyNotificationRequest:(NCNotificationRequest* )req;
 - (void) removeNotificationRequest:(NCNotificationRequest *)req;
-
-- (UIImage *) getIconForIdentifier:(NSString *)index;
 @end

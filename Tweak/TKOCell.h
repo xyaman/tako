@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import "TKOBundle.h"
 
 #import <Kuro/libKuro.h>
 
@@ -11,7 +12,7 @@
 @property(nonatomic, retain) UIImageView *iconView;
 @property(nonatomic, retain) UILabel *countLabel;
 @property(nonatomic, retain) UIView *blur;
-@property(nonatomic, retain) NSString *bundleID;
+@property(nonatomic, retain) TKOBundle *bundle;
 
 // Gesture
 @property(nonatomic, retain) UIPanGestureRecognizer *panGesture;
@@ -19,7 +20,5 @@
 @property(nonatomic) BOOL willBeRemoved;
 @property(nonatomic) CGRect initialFrame;
 
-// This also adds icon
-- (void) setBundleIdentifier:(NSString *)identifier;
-- (void) setCount:(NSInteger) count;
+- (void) updateColors;
 @end

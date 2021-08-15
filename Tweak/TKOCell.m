@@ -147,33 +147,27 @@
     self.iconView.image = nil;
     self.backgroundColor = [UIColor clearColor];
     self.countLabel.backgroundColor = [UIColor clearColor];
-    self.bundleID = nil;
+    self.bundle = nil;
 }
 
-- (void) setBundleIdentifier:(NSString *)bundleID {
-    self.bundleID = bundleID;
-    UIImage *appIcon = [[[TKOController sharedInstance] getIconForIdentifier:bundleID] copy];
-    UIColor *appColor = [Kuro getPrimaryColor:appIcon];
-    // self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
-    // self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor];
+- (void) updateColors {
+    UIColor *appColor = [Kuro getPrimaryColor:self.bundle.icon];
 
     // Axon version
     if([[TKOController sharedInstance].cellStyle intValue] == 1) {
         UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(20, 20)];
-        UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext){[appIcon drawInRect:(CGRect) {.origin = CGPointZero, .size = CGSizeMake(20, 20)}];}];
-        self.iconView.image = [image imageWithRenderingMode:appIcon.renderingMode];
+        UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext){[self.bundle.icon drawInRect:(CGRect) {.origin = CGPointZero, .size = CGSizeMake(20, 20)}];}];
+        self.iconView.image = [image imageWithRenderingMode:self.bundle.icon.renderingMode];
 
         self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
         self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor];
 
     } else {
-        self.iconView.image = appIcon ?: [UIImage new];
+        self.iconView.image = self.bundle.icon ?: [UIImage new];
     }
 
-}
+    self.countLabel.text = [NSString stringWithFormat:@"%ld", self.bundle.notifications.count];
 
-- (void) setCount:(NSInteger) count {
-    self.countLabel.text = [NSString stringWithFormat:@"%ld", count];
 }
 
 - (void) setSelected:(BOOL)selected {
@@ -194,9 +188,6 @@
     return fabs(velocity.y) > fabs(velocity.x);
 }
 
-// - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-//     return NO;
-// }
 
 - (void) handlePan:(UIPanGestureRecognizer *)gesture {
     CGPoint translation = [gesture translationInView:self];
@@ -229,7 +220,7 @@
             if(self.willBeRemoved) {
                 [self.taptic notificationOccurred:UINotificationFeedbackTypeSuccess];
                 // Remove cell
-                [[TKOController sharedInstance] removeAllNotificationsWithBundleID:self.bundleID];
+                [[TKOController sharedInstance] removeAllNotificationsWithBundleID:self.bundle.ID];
             } else {
                 [self.taptic notificationOccurred:UINotificationFeedbackTypeError];
             }

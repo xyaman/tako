@@ -10,10 +10,20 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[TKOController alloc] init];
 
-        sharedInstance.notifications = [NSMutableDictionary new];
+        sharedInstance.bundles = [NSMutableArray new];
         sharedInstance.isTkoCall = NO;
     });
     return sharedInstance;
+}
+
+- (NSInteger) indexOfBundleID:(NSString *)bundleID {
+
+    for(NSInteger i = self.bundles.count - 1; i >= 0; i--) {
+       TKOBundle *bundle = self.bundles[i];
+       if([bundle.ID isEqualToString:bundleID]) return i;
+    }
+
+    return NSNotFound;
 }
 
 // Every time a new notification is received, is redirected to here
@@ -24,21 +34,24 @@
     // [self.notifLock lock];
     self.view.lastBundleUpdated = [bundleID copy];
 
-    // If key exists just add to our data
-    if([self.notifications objectForKey:bundleID]) {
-        [self.notifications[bundleID] addObject:notif];
+    NSInteger index = [self indexOfBundleID:bundleID]; 
+
+    // bundle doesnt exists
+    if(index == NSNotFound) {
+        TKOBundle *newBundle = [TKOBundle initWithNCNotificationRequest:notif];
+
+        [self.bundles addObject:newBundle];
+        [self.view updateAllCells];
+    
+    } else {
+        TKOBundle *bundle = self.bundles[index]; 
+        [bundle newNotification:notif];
 
         // if that bundle is being showed right now, also insert to nlc
         if([self.view.selectedBundleID isEqualToString:bundleID]) [self insertNotificationToNlc:notif];
 
         // Also we update only this cell
         [self.view updateCellWithBundle:bundleID];
-    
-    // Key doesnt exists, we add but we also want to update our view
-    } else {
-        [self.notifications setObject:[NSMutableArray new] forKey:bundleID];
-        [self.notifications[bundleID] addObject:notif];
-        [self.view updateAllCells];
     }
 
     // [self.notifLock lock] 
@@ -49,19 +62,12 @@
 - (void) modifyNotificationRequest:(NCNotificationRequest* )req {
     
     // If key exists, just add a new item to key (sectionID) array
-    if([self.notifications objectForKey:req.bulletin.sectionID]) {
-    
-        NSArray *bundleNotifications = self.notifications[req.bulletin.sectionID];
+    NSString* bundleID = req.bulletin.sectionID;
+    NSInteger index = [self indexOfBundleID:bundleID]; 
 
-        for (NSInteger i = bundleNotifications.count - 1; i >= 0; i--) {
-            NCNotificationRequest* not = self.notifications[req.bulletin.sectionID][i];
-            if([not.notificationIdentifier isEqualToString:req.notificationIdentifier]) {
-                [self.notifications[req.bulletin.sectionID] removeObjectAtIndex:i];
-                [self.notifications[req.bulletin.sectionID] insertObject:[req copy] atIndex:i];
-                break;
-            }
-        }
-
+    if(index != NSNotFound) {
+        TKOBundle *bundle = self.bundles[index];
+        [bundle updateNotification:req];
     }
 }
 
@@ -69,39 +75,25 @@
 - (void) removeNotificationRequest:(NCNotificationRequest *)req {
     // Here we want to remove from our info but also from the system
     NSString* bundleID = req.bulletin.sectionID;
+    NSInteger index = [self indexOfBundleID:bundleID]; 
 
-    // [self.notifLock lock];
-
-    // If key exists just add to our data
-    if([self.notifications objectForKey:bundleID]) {
-        // Get array
-        NSMutableArray *bundleNotifs = self.notifications[bundleID];
-
-        // Remove notification from array
-        for (NSInteger i = bundleNotifs.count - 1; i >= 0; i--) {
-            if([((NCNotificationRequest *)bundleNotifs[i]).notificationIdentifier isEqualToString:req.notificationIdentifier]) {
-                [self removeNotificationFromNlc:bundleNotifs[i]];
-                [bundleNotifs removeObjectAtIndex:i];
-                break;
-            }
-        }
-
-        // Also we update only this cell
-        if(bundleNotifs.count == 0) {
-            [self.notifications removeObjectForKey:bundleID];
+    if(index == NSNotFound) {
+        // This shoudnt happen
+        [self removeNotificationFromNlc:req];
+    
+    } else {
+        TKOBundle *bundle = self.bundles[index]; 
+        [bundle removeNotification:req];
+        [self removeNotificationFromNlc:req];
+        
+        if(bundle.notifications.count == 0) {
+            [self.bundles removeObjectAtIndex:index];
             [self.view updateAllCells];
     
         } else {
             [self.view updateCellWithBundle:bundleID];
         }
-    
-    // THIS SHOULDNT HAPPEN
-    } else {
-        NSLog(@"[TakoTweak] Weird notification removed: %@", req);
-        [self removeNotificationFromNlc:req];
     }
-
-    // [self.notifLock lock] 
 
 }
 
@@ -112,7 +104,9 @@
 }
 
 - (void) insertAllNotificationsWithBundleID:(NSString *)bundleID {
-    for(NCNotificationRequest *notif in self.notifications[bundleID]) [self insertNotificationToNlc:notif];
+    NSInteger index = [self indexOfBundleID:bundleID];
+    TKOBundle *bundle = self.bundles[index];
+    for(int i = bundle.notifications.count - 1; i >= 0; i--) [self insertNotificationToNlc:bundle.notifications[i]];
 }
 
 - (void) removeNotificationFromNlc:(NCNotificationRequest *)req {
@@ -122,35 +116,28 @@
 }
 
 - (void) hideAllNotificationsWithBundleID:(NSString *)bundleID {
-    for(NCNotificationRequest *notif in self.notifications[bundleID]) [self removeNotificationFromNlc:notif];
+    NSInteger index = [self indexOfBundleID:bundleID];
+    TKOBundle *bundle = self.bundles[index];
+    for(int i = bundle.notifications.count - 1; i >= 0; i--) [self removeNotificationFromNlc:bundle.notifications[i]];
 }
 
 - (void) removeAllNotificationsWithBundleID:(NSString *)bundleID {
-    [self.dispatcher destination:nil requestsClearingNotificationRequests:self.notifications[bundleID]];
-    [self.notifications removeObjectForKey:bundleID];
+    NSInteger index = [self indexOfBundleID:bundleID];
+    __weak TKOBundle *bundle = self.bundles[index];
+
+    [self.dispatcher destination:nil requestsClearingNotificationRequests:bundle.notifications];
+    [self.bundles removeObjectAtIndex:index];
+    bundle.notifications = nil;
+
     if([self.view.selectedBundleID isEqualToString:bundleID]) self.view.selectedBundleID = nil;
-
-
     [self.view updateAllCells];
 }
 
 - (void) hideAllNotifications {
-    for(NSString *bundleID in self.notifications) [self hideAllNotificationsWithBundleID:bundleID];
-}
-
-- (UIImage *) getIconForIdentifier:(NSString *)identifier {
-    SBIconController *iconController = [objc_getClass("SBIconController") sharedInstance]; 
-    SBIcon *sbIcon = [iconController.model applicationIconForBundleIdentifier:identifier];
-
-    UIImage *icon = [sbIcon iconImageWithInfo:(struct SBIconImageInfo){60,60,2,0}];
-
-    // Fallback icon
-    if(!icon) {
-        sbIcon = [iconController.model applicationIconForBundleIdentifier:@"com.apple.Preferences"];
-        icon = [sbIcon iconImageWithInfo:(struct SBIconImageInfo){60,60,2,0}];
+    for(int i = self.bundles.count - 1; i >= 0; i--) {
+        TKOBundle *bundle = self.bundles[i];
+        [self hideAllNotificationsWithBundleID:bundle.ID];
     }
-
-    return icon;
 }
 
 @end
