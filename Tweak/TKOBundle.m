@@ -12,7 +12,7 @@
 
     bundle.ID = [req.bulletin.sectionID copy];
     bundle.notifications = [@[[req copy]] mutableCopy];
-    bundle.lastUpdate = [NSDate date];
+    bundle.lastUpdate = [req.timestamp copy];
     
     SBIconController *iconController = [objc_getClass("SBIconController") sharedInstance]; 
     SBIcon *sbIcon = [iconController.model applicationIconForBundleIdentifier:bundle.ID];
@@ -29,7 +29,7 @@
 }
 
 - (void) newNotification:(NCNotificationRequest *) req{
-    self.lastUpdate = [NSDate date];
+    self.lastUpdate = [req.timestamp copy];
     [self.notifications addObject:req];
 }
 

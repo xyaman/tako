@@ -81,37 +81,38 @@
 }
 
 - (void) prepareForDisplay {
-    // [self updateAllCells];
+    if(self.cellsInfo.count == 0) return;
 
-    // show for selected bundle
-    if(self.selectedBundleID) {
+    if(self.displayBy == DisplayByLastAppNotification && self.lastBundleUpdated) {
+
+        self.selectedBundleID = [self.lastBundleUpdated copy];
+        NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
+        if(cellIndex != NSNotFound) [self collectionView:self.colView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
+
+    } else if(self.displayBy == DisplayByAllClosed) {
+        self.selectedBundleID = nil;
+        [self.colView reloadData];
+    
+    } else if(self.selectedBundleID && self.displayBy != DisplayByItWasBefore) {
         NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
         if(cellIndex != NSNotFound) [self collectionView:self.colView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
     }
+
     [[TKOController sharedInstance].nlc revealNotificationHistory:YES animated:YES];
     [[TKOController sharedInstance].nlc _resetCellWithRevealedActions];
-
-    if(self.cellsInfo.count == 0) return;
-
-    if(self.displayBy == 0) {
-        // Do nothing
-    
-    } else if(self.displayBy == 1 && self.lastBundleUpdated) {
-
-        // [[TKOController sharedInstance] hideAllNotifications];
-        // self.selectedBundleID = [self.lastBundleUpdated copy];
-        [self.colView reloadData];
-
-    } else if(self.displayBy == 2) {
-        self.selectedBundleID = nil;
-        [[TKOController sharedInstance] hideAllNotifications];
-        [self.colView reloadData];
-    }
 }
 
 - (void) prepareToHide {
+    // We dont want to do anything
+    if(self.cellsInfo.count == 0 || self.displayBy == DisplayByItWasBefore) return;
+
     [[TKOController sharedInstance] hideAllNotifications];
-    if(self.selectedBundleID) {
+
+    if(self.displayBy == DisplayByLastAppNotification && self.lastBundleUpdated) {
+        NSInteger cellIndex = [self getCellIndexByBundle:self.lastBundleUpdated];
+        if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
+
+    } else if(self.selectedBundleID) {
         NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
         if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
     }

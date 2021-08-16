@@ -1,6 +1,12 @@
 #import <UIKit/UIKit.h>
 
 // Tweak headers
+typedef NS_ENUM(NSInteger, DisplayBy) {
+    DisplayByItWasBefore,
+    DisplayByLastAppNotification,
+    DisplayByAllClosed
+};
+
 typedef NS_ENUM(NSInteger, SortBy) {
     SortByLastestNotification,
     SortByBundleName,
@@ -42,9 +48,6 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 -(void)setBacklightFactorPending:(float)value;
 @end
 
-@interface CSAdjunctItemView : UIView
-@end
-
 @interface BBBulletin : NSObject
 @property(copy, nonatomic) NSString *title;
 @property(copy, nonatomic) NSString *sectionID;
@@ -53,35 +56,25 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 @interface NCNotificationRequest : NSObject
 @property (readonly, copy, nonatomic) NSString *notificationIdentifier;
 @property(nonatomic,readonly) BBBulletin *bulletin; 
+@property (readonly, nonatomic) NSDate *timestamp;
 @end
 
 @interface NCNotificationMasterList : NSObject
 @property (nonatomic,readonly) unsigned long long notificationCount; 
--(void)setNotificationHistoryRevealed:(BOOL)arg1 ;
 @end
 
-@interface CSCombinedListViewController : UIViewController
--(void)forceNotificationHistoryRevealed:(BOOL)arg1 animated:(BOOL)arg2 ;
--(BOOL) notificationStructuredListViewControllerShouldAllowNotificationHistoryReveal:(id)arg1;
--(void)notificationStructuredListViewControllerDidScrollToRevealNotificationHistory:(id)arg1 ;
+@interface NCNotificationListView : NSObject
+@property (nonatomic) BOOL revealed;
 @end
 
 @interface NCNotificationStructuredListViewController : UIViewController
-@property (weak, nonatomic) CSCombinedListViewController *delegate;
-@property (retain, nonatomic) NCNotificationMasterList *masterList;
-
--(void)revealNotificationHistory:(BOOL)arg0 animated:(BOOL)arg1 ;
--(void)_resetCellWithRevealedActions;
-
 -(void)insertNotificationRequest:(NCNotificationRequest *)arg1;
 -(void)modifyNotificationRequest:(NCNotificationRequest* )arg1;
 -(void)removeNotificationRequest:(NCNotificationRequest *)arg1;
--(BOOL)hasVisibleContentToReveal;
--(BOOL)hasVisibleContent;
--(BOOL)notificationMasterListShouldAllowNotificationHistoryReveal:(id)arg1 ;
+
+-(void)revealNotificationHistory:(BOOL)arg0 animated:(BOOL)arg1 ;
+-(void)_resetCellWithRevealedActions;
 @end
-
-
 
 @interface NCNotificationDispatcher : NSObject
 -(void)removeNotificationSectionWithIdentifier:(id)arg0;

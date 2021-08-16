@@ -1,15 +1,13 @@
 #import "IOSHeaders.h"
 #import "Tweak.h"
 
-CSCombinedListViewController *cs = nil;
-
 void updatePrefs() {
     [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
 
     [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
     [TKOController sharedInstance].view.colView.pagingEnabled = prefUsePaging;
-    [[TKOController sharedInstance].view.colView reloadData];
+    [[TKOController sharedInstance].view updateAllCells];
 }
 
 %group TakoTweak
@@ -33,10 +31,21 @@ void updatePrefs() {
     if(value > 0.0f) {
         [[TKOController sharedInstance].view prepareForDisplay];
     } else {
-       [TKOController sharedInstance].view.selectedBundleID = nil; 
-       [[TKOController sharedInstance].view.colView reloadData]; 
        [[TKOController sharedInstance].view prepareToHide];
     }
+}
+%end
+
+%hook CSCombinedListViewController
+-(BOOL)notificationStructuredListViewControllerShouldAllowNotificationHistoryReveal:(id)arg1 {
+    return YES;
+}
+%end
+
+%hook NCNotificationListView
+
+- (void)setRevealed:(BOOL)arg1 { // always reveal notifications
+    %orig(YES);
 }
 %end
 
@@ -100,13 +109,6 @@ void updatePrefs() {
 %end
 
 
-%hook CSCombinedListViewController
--(BOOL)notificationStructuredListViewControllerShouldAllowNotificationHistoryReveal:(id)arg1 {
-    return YES;
-}
-%end
-
-
 %hook SBNCNotificationDispatcher
 -(id)init {
     %orig;
@@ -127,30 +129,22 @@ void updatePrefs() {
     return orig;
 }
 
--(void) viewDidAppear:(BOOL)arg0 {
-    %orig;
-}
-
-
 -(BOOL)notificationMasterListShouldAllowNotificationHistoryReveal:(id)arg1 {
     return YES;
 }
 
 -(void)insertNotificationRequest:(NCNotificationRequest *)notification {
-
     if([TKOController sharedInstance].isTkoCall) {
         %orig;
         [self revealNotificationHistory:YES animated:YES];
         return;
     }
-
     [[TKOController sharedInstance] insertNotificationRequest:notification];
 }
 
 -(void)modifyNotificationRequest:(NCNotificationRequest* )notification {
     // Probably never lol
     if([TKOController sharedInstance].isTkoCall) return %orig;
-
     [[TKOController sharedInstance] modifyNotificationRequest:notification];
 }
 
@@ -189,15 +183,15 @@ void updatePrefs() {
     // self.stackView.distribution = UIStackViewDistributionFillProportionally;
 
     CGFloat height = 0;
-    CGFloat width = [[UIScreen mainScreen] bounds].size.width - 20;
+    CGFloat width = [[UIScreen mainScreen] bounds].size.width;
 
     if([prefCellStyle intValue] == 0)  height = 110; // Default
     else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
     else if([prefCellStyle intValue] == 2) height = 100; // Axon grouped
 
     self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
-    updatePrefs(); // Todo check this
     [TKOController sharedInstance].view = self.tkoView;
+    updatePrefs(); // Todo check this
     [self.stackView addArrangedSubview:self.tkoView];
 }
 
@@ -215,9 +209,6 @@ void updatePrefs() {
     [self.tkoView removeFromSuperview];
     // [self.stackView insertArrangedSubview:self.tkoView atIndex:0];
     [self.stackView addArrangedSubview:self.tkoView];
-
-    // Force stackview update
-    self.stackView.frame = CGRectMake(0, 0, 0, 0);
 }
 
 %end

@@ -26,7 +26,6 @@ NSNumber *prefCellStyle = nil;
 @property(nonatomic, retain) UIStackView *stackView;
 @property(nonatomic, retain) TKOView *tkoView;
 
-
 -(void)_insertItem:(id)arg0 animated:(BOOL)arg1 ;
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 ;
 @end
