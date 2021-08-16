@@ -219,6 +219,7 @@
     self.countLabel.backgroundColor = [UIColor clearColor];
     self.bottomBar.backgroundColor = [UIColor clearColor];
     self.bundle = nil;
+    if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = YES;
 }
 
 - (UIImage *) resizeIconTo:(CGSize)newSize {
@@ -255,8 +256,10 @@
     [super setSelected:selected];
 
     if(selected) {
+        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = NO;
         self.backgroundColor = [Kuro getPrimaryColor:self.iconView.image];
     } else {
+        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = YES;
         self.backgroundColor = [UIColor clearColor];
     }
 }
@@ -272,7 +275,6 @@
 
 - (void) handlePan:(UIPanGestureRecognizer *)gesture {
     CGPoint translation = [gesture translationInView:self];
-
     CGFloat movement = translation.y > 0 ? pow(translation.y, 0.7) : -pow(-translation.y, 0.7);
 
     switch(gesture.state) {
@@ -287,13 +289,7 @@
             self.frame = CGRectMake(self.initialFrame.origin.x, self.initialFrame.origin.y + movement, self.frame.size.width, self.frame.size.height);
             self.closeShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / 30;
             
-            if(movement >= 30 && !self.willBeRemoved) {
-                self.willBeRemoved = YES;
-                // [self.taptic notificationOccurred:UINotificationFeedbackTypeWarning];
-            
-            } else if(movement < 30) {
-                self.willBeRemoved = NO;
-            }
+            self.willBeRemoved = movement >= 30;
             
             break;
             
