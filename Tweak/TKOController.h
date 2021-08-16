@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
-#import "CommonHeaders.h"
+#import "IOSHeaders.h"
 #import "TKOView.h"
 #import "TKOBundle.h"
 

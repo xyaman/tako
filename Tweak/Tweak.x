@@ -1,4 +1,5 @@
 #import "Tweak.h"
+#import "IOSHeaders.h"
 
 void updatePrefs() {
     [TKOController sharedInstance].cellStyle = prefCellStyle;

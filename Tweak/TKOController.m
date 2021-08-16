@@ -126,6 +126,7 @@
     __weak TKOBundle *bundle = self.bundles[index];
 
     [self.dispatcher destination:nil requestsClearingNotificationRequests:bundle.notifications];
+    [self hideAllNotificationsWithBundleID:bundle.ID];
     [self.bundles removeObjectAtIndex:index];
     bundle.notifications = nil;
 

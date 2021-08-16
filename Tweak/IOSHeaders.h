@@ -1,5 +1,37 @@
 #import <UIKit/UIKit.h>
 
+@interface UIView (Private)
+- (void) _updateSizeToMimic;
+@end
+
+
+// History notifications
+@interface NCNotificationListSectionHeaderView : UIView
+@end
+
+// Older notifications
+@interface NCNotificationListSectionRevealHintView : UIView
+@end
+
+@interface NCNotificationListCoalescingHeaderCell : UIView
+@end
+
+@interface NCNotificationListCoalescingControlsCell : UIView
+@end
+
+@interface CSCoverSheetViewController : UIViewController
+@end
+
+@interface CSPageViewController : UIViewController
+@end
+
+@interface SBBacklightController : NSObject
+-(void)setBacklightFactorPending:(float)value;
+@end
+
+@interface CSAdjunctItemView : UIView
+@end
+
 @interface BBBulletin : NSObject
 @property(copy, nonatomic) NSString *title;
 @property(copy, nonatomic) NSString *sectionID;

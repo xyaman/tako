@@ -1,7 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <Cephei/HBPreferences.h>
 
-#import "CommonHeaders.h"
 #import "TKOController.h"
 #import "TKOView.h"
 
@@ -22,12 +21,8 @@ NSNumber *prefCellStyle = nil;
 
 
 /*----------------------
- / Class definitions
+ / Essential Class definitions
  -----------------------*/
-@interface UIView (Private)
-- (void) _updateSizeToMimic;
-@end
-
 @interface CSNotificationAdjunctListViewController : UIViewController
 @property(nonatomic, retain) UIStackView *stackView;
 @property(nonatomic, retain) TKOView *tkoView;
@@ -37,31 +32,4 @@ NSNumber *prefCellStyle = nil;
 
 -(void)_insertItem:(id)arg0 animated:(BOOL)arg1 ;
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 ;
-@end
-
-// History notifications
-@interface NCNotificationListSectionHeaderView : UIView
-@end
-
-// Older notifications
-@interface NCNotificationListSectionRevealHintView : UIView
-@end
-
-@interface NCNotificationListCoalescingHeaderCell : UIView
-@end
-
-@interface NCNotificationListCoalescingControlsCell : UIView
-@end
-
-@interface CSCoverSheetViewController : UIViewController
-@end
-
-@interface CSPageViewController : UIViewController
-@end
-
-@interface SBBacklightController : NSObject
--(void)setBacklightFactorPending:(float)value;
-@end
-
-@interface CSAdjunctItemView : UIView
 @end

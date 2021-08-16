@@ -60,6 +60,7 @@
 
 - (void) updateAllCells {
     self.cellsInfo = [[TKOController sharedInstance].bundles mutableCopy];
+    if(self.cellsInfo.count == 0) self.selectedBundleID = nil;
 
     [self sortCells];
     [self.colView reloadData];
@@ -67,15 +68,14 @@
 
 - (void) updateCellWithBundle:(NSString *)bundleID {
 
-    NSInteger cellIndex = [self getCellIndexByBundle:bundleID];
-
     // If we are sorting by notification count, we need to update all cells again
     if(self.sortBy == 0) {
-        [self sortCells];
-        [self.colView reloadData];
+        [self updateAllCells];
     
     // Otherwise we only update this cell
     } else {
+        self.cellsInfo = [[TKOController sharedInstance].bundles mutableCopy];
+        NSInteger cellIndex = [self getCellIndexByBundle:bundleID];
         [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:cellIndex inSection:0]]];
     }
 }
@@ -88,8 +88,8 @@
     
     } else if(self.displayBy == 1 && self.lastBundleUpdated) {
 
-        [[TKOController sharedInstance] hideAllNotifications];
-        self.selectedBundleID = [self.lastBundleUpdated copy];
+        // [[TKOController sharedInstance] hideAllNotifications];
+        // self.selectedBundleID = [self.lastBundleUpdated copy];
         [self.colView reloadData];
 
     } else if(self.displayBy == 2) {
