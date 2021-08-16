@@ -80,7 +80,7 @@
 
     if(index == NSNotFound) {
         // This shoudnt happen
-        [self removeNotificationFromNlc:req];
+        // [self removeNotificationFromNlc:req];
     
     } else {
         TKOBundle *bundle = self.bundles[index]; 
@@ -106,6 +106,8 @@
 
 - (void) insertAllNotificationsWithBundleID:(NSString *)bundleID {
     NSInteger index = [self indexOfBundleID:bundleID];
+    if(index == NSNotFound) return;
+
     TKOBundle *bundle = self.bundles[index];
     for(int i = bundle.notifications.count - 1; i >= 0; i--) [self insertNotificationToNlc:bundle.notifications[i]];
 }
@@ -118,12 +120,16 @@
 
 - (void) hideAllNotificationsWithBundleID:(NSString *)bundleID {
     NSInteger index = [self indexOfBundleID:bundleID];
+    if(index == NSNotFound) return;
+
     TKOBundle *bundle = self.bundles[index];
     for(int i = bundle.notifications.count - 1; i >= 0; i--) [self removeNotificationFromNlc:bundle.notifications[i]];
 }
 
 - (void) removeAllNotificationsWithBundleID:(NSString *)bundleID {
     NSInteger index = [self indexOfBundleID:bundleID];
+    if(index == NSNotFound) return;
+
     __weak TKOBundle *bundle = self.bundles[index];
 
     [self.dispatcher destination:nil requestsClearingNotificationRequests:bundle.notifications];

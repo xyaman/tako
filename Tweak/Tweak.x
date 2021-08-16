@@ -1,6 +1,8 @@
 #import "IOSHeaders.h"
 #import "Tweak.h"
 
+CSCombinedListViewController *cs = nil;
+
 void updatePrefs() {
     [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
 
@@ -12,22 +14,15 @@ void updatePrefs() {
 
 %group TakoTweak
 
-// %hook CSCoverSheetViewController
-// - (void)viewWillAppear:(BOOL)animated {
-//     %orig;
-//     [[TKOController sharedInstance].view prepareForDisplay];
-// }
-
-// - (void)viewWillDisappear:(BOOL)animated {
-//     %orig;
-
-// }
-// %end
-
-%hook CSPageViewController
+%hook CSCoverSheetViewController
 -(void)viewWillAppear:(BOOL)animated {
-    %orig;
     [[TKOController sharedInstance].view prepareForDisplay];
+    %orig;
+}
+
+-(void)viewWillDisappear:(BOOL)animated {
+    [[TKOController sharedInstance].view prepareToHide];
+    %orig;
 }
 %end
 
@@ -37,6 +32,10 @@ void updatePrefs() {
     // Screen is on
     if(value > 0.0f) {
         [[TKOController sharedInstance].view prepareForDisplay];
+    } else {
+       [TKOController sharedInstance].view.selectedBundleID = nil; 
+       [[TKOController sharedInstance].view.colView reloadData]; 
+       [[TKOController sharedInstance].view prepareToHide];
     }
 }
 %end
@@ -100,6 +99,14 @@ void updatePrefs() {
 }
 %end
 
+
+%hook CSCombinedListViewController
+-(BOOL)notificationStructuredListViewControllerShouldAllowNotificationHistoryReveal:(id)arg1 {
+    return YES;
+}
+%end
+
+
 %hook SBNCNotificationDispatcher
 -(id)init {
     %orig;
@@ -111,7 +118,6 @@ void updatePrefs() {
     %orig;
     [TKOController sharedInstance].dispatcher = arg1;
 }
-
 %end
 
 %hook NCNotificationStructuredListViewController
@@ -119,6 +125,15 @@ void updatePrefs() {
     id orig = %orig;
     [TKOController sharedInstance].nlc = self; // Save an instance of this class
     return orig;
+}
+
+-(void) viewDidAppear:(BOOL)arg0 {
+    %orig;
+}
+
+
+-(BOOL)notificationMasterListShouldAllowNotificationHistoryReveal:(id)arg1 {
+    return YES;
 }
 
 -(void)insertNotificationRequest:(NCNotificationRequest *)notification {
@@ -144,6 +159,24 @@ void updatePrefs() {
     [[TKOController sharedInstance] removeNotificationRequest:notification];
 }
 
+%end
+
+%hook NCNotificationMasterList
+- (void) setNotificationCount:(unsigned long long)arg1 {
+    %orig([TKOController sharedInstance].bundles.count);
+}
+
+- (unsigned long long) notificationCount {
+    return [TKOController sharedInstance].bundles.count;
+}
+
+-(BOOL)shouldAllowNotificationHistoryReveal{
+    return YES;
+}
+
+-(BOOL)notificationListRevealCoordinatorShouldAllowReveal:(id)arg0 {
+    return YES;
+}
 %end
 
 %hook CSNotificationAdjunctListViewController
@@ -186,6 +219,7 @@ void updatePrefs() {
     // Force stackview update
     self.stackView.frame = CGRectMake(0, 0, 0, 0);
 }
+
 %end
 %end
 

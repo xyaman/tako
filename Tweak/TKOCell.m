@@ -22,7 +22,7 @@
     // Close view
     self.closeView = [UIView new];
     self.closeView.hidden = YES;
-    self.closeView.layer.cornerRadius = 13;
+    self.closeView.layer.cornerRadius = 10;
     self.closeView.backgroundColor = [UIColor redColor];
     [self addSubview:self.closeView];
 

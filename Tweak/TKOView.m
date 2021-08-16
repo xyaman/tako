@@ -76,11 +76,21 @@
     } else {
         self.cellsInfo = [[TKOController sharedInstance].bundles mutableCopy];
         NSInteger cellIndex = [self getCellIndexByBundle:bundleID];
-        [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:cellIndex inSection:0]]];
+        if(cellIndex != NSNotFound) [self.colView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:cellIndex inSection:0]]];
     }
 }
 
 - (void) prepareForDisplay {
+    // [self updateAllCells];
+
+    // show for selected bundle
+    if(self.selectedBundleID) {
+        NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
+        if(cellIndex != NSNotFound) [self collectionView:self.colView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
+    }
+    [[TKOController sharedInstance].nlc revealNotificationHistory:YES animated:YES];
+    [[TKOController sharedInstance].nlc _resetCellWithRevealedActions];
+
     if(self.cellsInfo.count == 0) return;
 
     if(self.displayBy == 0) {
@@ -96,6 +106,14 @@
         self.selectedBundleID = nil;
         [[TKOController sharedInstance] hideAllNotifications];
         [self.colView reloadData];
+    }
+}
+
+- (void) prepareToHide {
+    [[TKOController sharedInstance] hideAllNotifications];
+    if(self.selectedBundleID) {
+        NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
+        if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
     }
 }
 
@@ -121,10 +139,11 @@
 - (NSInteger) getCellIndexByBundle:(NSString *)bundleID {
 
     for(NSInteger i = self.cellsInfo.count - 1; i >= 0; i--) {
-        if([((TKOBundle*)self.cellsInfo[i]).ID isEqualToString:bundleID]) return i;
+       TKOBundle *bundle = self.cellsInfo[i];
+       if([bundle.ID isEqualToString:bundleID]) return i;
     }
 
-    return -1;
+    return NSNotFound;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
