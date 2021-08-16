@@ -1,9 +1,22 @@
 #import <UIKit/UIKit.h>
 
+// Tweak headers
+typedef NS_ENUM(NSInteger, SortBy) {
+    SortByLastestNotification,
+    SortByBundleName,
+    SortByNotificationCount
+};
+
+typedef NS_ENUM(NSInteger, CellStyle) {
+    CellStyleDefault,
+    CellStyleAxonGrouped,
+    CellStyleFullIcon
+};
+//
+
 @interface UIView (Private)
 - (void) _updateSizeToMimic;
 @end
-
 
 // History notifications
 @interface NCNotificationListSectionHeaderView : UIView

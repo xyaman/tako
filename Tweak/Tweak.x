@@ -1,11 +1,11 @@
-#import "Tweak.h"
 #import "IOSHeaders.h"
+#import "Tweak.h"
 
 void updatePrefs() {
-    [TKOController sharedInstance].cellStyle = prefCellStyle;
+    [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
 
-    [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
     [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
+    [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
     [TKOController sharedInstance].view.colView.pagingEnabled = prefUsePaging;
     [[TKOController sharedInstance].view.colView reloadData];
 }
@@ -160,6 +160,7 @@ void updatePrefs() {
 
     if([prefCellStyle intValue] == 0)  height = 110; // Default
     else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
+    else if([prefCellStyle intValue] == 2) height = 100; // Axon grouped
 
     self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
     updatePrefs(); // Todo check this

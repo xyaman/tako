@@ -1,7 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
-#import "IOSHeaders.h"
 #import "TKOView.h"
 #import "TKOBundle.h"
 
@@ -15,7 +14,7 @@
 @property(nonatomic) BOOL isTkoCall;
 
 // Customization
-@property(nonatomic, retain) NSNumber *cellStyle;
+@property(nonatomic) int cellStyle;
 
 + (TKOController *) sharedInstance;
 - (void) insertNotificationToNlc:(NCNotificationRequest *)req;

@@ -62,11 +62,13 @@
                 <array>
                     <integer>0</integer>
                     <integer>1</integer>
+                    <integer>2</integer>
                 </array>
                 <key>validTitles</key>
                 <array>
                     <string>Tako ugly for now</string>
                     <string>Axon grouped style</string>
+                    <string>Full Icon</string>
                 </array>
                 <key>default</key>
                 <integer>0</integer>

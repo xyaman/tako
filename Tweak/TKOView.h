@@ -1,15 +1,12 @@
 #import <UIKit/UIKit.h>
 
-#import "TKOCell.h"
-
 @interface TKOView : UIView <UICollectionViewDelegate, UICollectionViewDataSource>
 // Views
 @property(nonatomic, retain) UICollectionView *colView;
 @property(nonatomic, retain) UICollectionViewFlowLayout *colLayout;
 
-// Sort style cells
-@property(nonatomic) int sortBy;
 @property(nonatomic) int displayBy;
+@property(nonatomic) int sortBy;
 
 // Cells info related
 @property(nonatomic, retain) NSMutableArray *cellsInfo;

@@ -1,6 +1,7 @@
 #import "TKOView.h"
 #import "TKOController.h"
 #import "objc/runtime.h"
+#import "TKOCell.h"
 
 @interface TKOView ()
 @end
@@ -14,8 +15,7 @@
     self.colLayout = [UICollectionViewFlowLayout new];
     self.colLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
 
-    if([[TKOController sharedInstance].cellStyle intValue] == 0) self.colLayout.itemSize = CGSizeMake(60, 80);
-    else if([[TKOController sharedInstance].cellStyle intValue] == 1) self.colLayout.itemSize = CGSizeMake(58, 33);
+    self.colLayout.itemSize = [TKOCell cellSize];
     
     // UICollection
     self.colView = [[UICollectionView alloc]initWithFrame:CGRectZero collectionViewLayout:self.colLayout];
@@ -69,7 +69,7 @@
 - (void) updateCellWithBundle:(NSString *)bundleID {
 
     // If we are sorting by notification count, we need to update all cells again
-    if(self.sortBy == 0) {
+    if(self.sortBy == SortByLastestNotification || self.sortBy == SortByNotificationCount) {
         [self updateAllCells];
     
     // Otherwise we only update this cell
@@ -101,12 +101,12 @@
 
 - (void) sortCells {
     // Count
-    if(self.sortBy == 0 && self.cellsInfo.count > 1) {
+    if(self.sortBy == SortByLastestNotification && self.cellsInfo.count > 1) {
         [self.cellsInfo sortUsingComparator:^NSComparisonResult(TKOBundle *a, TKOBundle *b) {
             return [b.lastUpdate compare:a.lastUpdate];
         }];
     
-    } else if(self.sortBy == 1 && self.cellsInfo.count > 1) {
+    } else if(self.sortBy == SortByNotificationCount && self.cellsInfo.count > 1) {
         [self.cellsInfo sortUsingComparator:^NSComparisonResult(TKOBundle *a, TKOBundle *b) {
             return [b.ID compare:a.ID];
         }];

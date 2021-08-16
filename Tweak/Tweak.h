@@ -2,11 +2,11 @@
 #import <Cephei/HBPreferences.h>
 
 #import "TKOController.h"
-#import "TKOView.h"
 
 /*----------------------
  / Preferences
  -----------------------*/
+
 HBPreferences *preferences = nil;
 BOOL isEnabled = NO;
 
@@ -19,15 +19,12 @@ BOOL prefUsePaging = NO;
 // Cell
 NSNumber *prefCellStyle = nil;
 
-
 /*----------------------
  / Essential Class definitions
  -----------------------*/
 @interface CSNotificationAdjunctListViewController : UIViewController
 @property(nonatomic, retain) UIStackView *stackView;
 @property(nonatomic, retain) TKOView *tkoView;
-
--(BOOL)isShowingMediaControls;
 
 
 -(void)_insertItem:(id)arg0 animated:(BOOL)arg1 ;

@@ -9,6 +9,7 @@
 - (id) initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     self.layer.cornerRadius = 13;
+    self.layer.cornerCurve = kCACornerCurveContinuous;
     self.backgroundColor = [UIColor clearColor];
 
     // View blur
@@ -69,10 +70,26 @@
     self.willBeRemoved = NO;
 
     // Setup style
-    if([[TKOController sharedInstance].cellStyle intValue] == 0) [self setupUgly];
-    else if([[TKOController sharedInstance].cellStyle intValue] == 1) [self setupAxonStyle];
+    if([TKOController sharedInstance].cellStyle == CellStyleDefault) [self setupUgly];
+    else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) [self setupAxonStyle];
+    else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) [self setupFullIcon];
 
     return self;
+}
+
++ (CGSize) cellSize {
+    switch([TKOController sharedInstance].cellStyle) {
+        case CellStyleDefault:
+            return CGSizeMake(50, 70);
+            break;
+        case CellStyleAxonGrouped:
+            return CGSizeMake(58, 33);
+            break;
+        case CellStyleFullIcon:
+            return CGSizeMake(51, 60);
+    };
+
+    return CGSizeZero;
 }
 
 - (void) setupUgly {
@@ -100,6 +117,60 @@
     [self.countLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
     [self.countLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [self.countLabel.widthAnchor constraintEqualToConstant:self.frame.size.width].active = YES;
+}
+
+- (void) setupFullIcon {
+    CGFloat radius = 13;
+
+    self.layer.cornerRadius = radius;
+    self.blur.layer.cornerRadius = radius;
+    self.blur.hidden = YES;
+
+    self.iconView = [UIImageView new];
+    self.iconView.userInteractionEnabled = NO;
+    [self addSubview:self.iconView];
+
+    // self.iconView.layer.cornerRadius = ;
+    self.iconView.layer.cornerCurve = kCACornerCurveContinuous;
+    self.iconView.clipsToBounds = YES;
+
+    self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.iconView.topAnchor constraintEqualToAnchor:self.topAnchor constant:3].active = YES;
+    [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:3].active = YES;
+    [self.iconView.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-3].active = YES;
+    [self.iconView.heightAnchor constraintEqualToConstant:45].active = YES;
+    [self.iconView.widthAnchor constraintEqualToConstant:45].active = YES;
+
+    self.countLabel = [UILabel new];
+    self.countLabel.backgroundColor = [UIColor blackColor];
+    self.countLabel.userInteractionEnabled = NO;
+    [self addSubview:self.countLabel];
+
+    self.countLabel.textAlignment = NSTextAlignmentCenter;
+    self.countLabel.clipsToBounds = YES;
+    self.countLabel.font = [UIFont systemFontOfSize:10];
+
+    self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.countLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:-5].active = YES;
+    [self.countLabel.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:5].active = YES;
+    [self.countLabel.heightAnchor constraintEqualToConstant:20].active = YES;
+    [self.countLabel.widthAnchor constraintEqualToConstant:20].active = YES;
+
+    self.countLabel.layer.cornerRadius = 10;
+    self.countLabel.layer.cornerCurve = kCACornerCurveContinuous;
+
+    // Bottom bar
+    self.bottomBar = [UIView new];
+    self.bottomBar.layer.cornerRadius = 3;
+    self.bottomBar.backgroundColor = [UIColor blackColor];
+    self.bottomBar.layer.cornerCurve = kCACornerCurveContinuous;
+    [self addSubview:self.bottomBar];
+
+    self.bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.bottomBar.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-4].active = YES;
+    [self.bottomBar.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:10].active = YES;
+    [self.bottomBar.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-10].active = YES;
+    [self.bottomBar.heightAnchor constraintEqualToConstant:5].active = YES;
 }
 
 - (void) setupAxonStyle {
@@ -136,9 +207,8 @@
     [self.countLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
     [self.countLabel.heightAnchor constraintEqualToConstant:20].active = YES;
     [self.countLabel.widthAnchor constraintEqualToConstant:20].active = YES;
-    [self layoutIfNeeded];
 
-    self.countLabel.layer.cornerRadius = self.countLabel.frame.size.width / 2;
+    self.countLabel.layer.cornerRadius = 10;
     self.countLabel.layer.cornerCurve = kCACornerCurveContinuous;
 }
 
@@ -147,27 +217,38 @@
     self.iconView.image = nil;
     self.backgroundColor = [UIColor clearColor];
     self.countLabel.backgroundColor = [UIColor clearColor];
+    self.bottomBar.backgroundColor = [UIColor clearColor];
     self.bundle = nil;
+}
+
+- (UIImage *) resizeIconTo:(CGSize)newSize {
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:newSize];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext){[self.bundle.icon drawInRect:(CGRect) {.origin = CGPointZero, .size = newSize}];}];
+    return [image imageWithRenderingMode:self.bundle.icon.renderingMode];
 }
 
 - (void) updateColors {
     UIColor *appColor = [Kuro getPrimaryColor:self.bundle.icon];
 
-    // Axon version
-    if([[TKOController sharedInstance].cellStyle intValue] == 1) {
-        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(20, 20)];
-        UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext){[self.bundle.icon drawInRect:(CGRect) {.origin = CGPointZero, .size = CGSizeMake(20, 20)}];}];
-        self.iconView.image = [image imageWithRenderingMode:self.bundle.icon.renderingMode];
+    if([TKOController sharedInstance].cellStyle == CellStyleDefault) {
+       self.iconView.image = self.bundle.icon ?: [UIImage new];
+
+    } else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) {
+        self.iconView.image = [self resizeIconTo:CGSizeMake(20, 20)];
 
         self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
         self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor];
 
-    } else {
-        self.iconView.image = self.bundle.icon ?: [UIImage new];
+    } else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) {
+
+        self.iconView.image = [self resizeIconTo:CGSizeMake(45, 45)];
+
+        self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
+        self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor]; 
+        self.bottomBar.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
     }
 
     self.countLabel.text = [NSString stringWithFormat:@"%ld", self.bundle.notifications.count];
-
 }
 
 - (void) setSelected:(BOOL)selected {
