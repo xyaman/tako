@@ -33,9 +33,9 @@
     NCNotificationRequest *notif = [req copy];
 
     // [self.notifLock lock];
-    self.view.lastBundleUpdated = [bundleID copy];
 
     NSInteger index = [self indexOfBundleID:bundleID]; 
+    NSLog(@"[TakoView] selected: %@", self.view.selectedBundleID);
 
     // bundle doesnt exists
     if(index == NSNotFound) {
@@ -55,6 +55,7 @@
         [self.view updateCellWithBundle:bundleID];
     }
 
+    self.view.lastBundleUpdated = [NSString stringWithString:bundleID];
     // [self.notifLock lock] 
 }
 
@@ -95,7 +96,6 @@
             [self.view updateCellWithBundle:bundleID];
         }
     }
-
 }
 
 - (void) insertNotificationToNlc:(NCNotificationRequest *)req {
@@ -110,6 +110,9 @@
 
     TKOBundle *bundle = self.bundles[index];
     for(int i = bundle.notifications.count - 1; i >= 0; i--) [self insertNotificationToNlc:bundle.notifications[i]];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self.nlc _resetCellWithRevealedActions];
+    });
 }
 
 - (void) removeNotificationFromNlc:(NCNotificationRequest *)req {
@@ -142,9 +145,10 @@
 }
 
 - (void) hideAllNotifications {
-    for(int i = self.bundles.count - 1; i >= 0; i--) {
-        TKOBundle *bundle = self.bundles[i];
-        [self hideAllNotificationsWithBundleID:bundle.ID];
+    NSArray *requests = [self.nlc allRequests];
+    for(int i = requests.count - 1; i >= 0; i--) {
+        NCNotificationRequest *req = requests[i];
+        [self removeNotificationFromNlc:req];
     }
 }
 

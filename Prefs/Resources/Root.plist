@@ -7,6 +7,23 @@
             <dict>
                 <key>cell</key>
                 <string>PSGroupCell</string>
+                <key>headerCellClass</key>
+                <string>HBPackageNameHeaderCell</string>
+                <key>condensed</key>
+                <true/>
+                <key>icon</key>
+                <string>icon.png</string>
+                <key>packageIdentifier</key>
+                <string>com.xyaman.tako</string>
+                <key>footerText</key>
+                <string>Notification priority hub</string>
+                <key>footerAlignment</key>
+                <integer>1</integer>
+            </dict>
+
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
                 <key>label</key>
                 <string>Settings</string>
             </dict>
@@ -163,7 +180,9 @@
                 <key>cellClass</key>
                 <string>HBLinkTableCell</string>
                 <key>label</key>
-                <string>Donate me ☕️</string>
+                <string>Donate me</string>
+                <key>subtitle</key>
+                <string>Help support future development</string>
                 <key>url</key>
                 <string>https://paypal.me/xyamandev</string>
             </dict>
@@ -171,7 +190,9 @@
                 <key>cellClass</key>
                 <string>HBLinkTableCell</string>
                 <key>label</key>
-                <string>Source Code ⚙️</string>
+                <string>Source Code</string>
+                <key>subtitle</key>
+                <string>Github</string>
                 <key>url</key>
                 <string>https://github.com/xyaman/tako</string>
             </dict>

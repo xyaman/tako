@@ -13,8 +13,8 @@
             <string>Tako</string>
 
             <!-- Icon -->
-            <!-- <key>icon</key>
-            <string>icon.png</string> -->
+            <key>icon</key>
+            <string>icon.png</string>
 
             <!-- Controller being loaded -->
             <key>detail</key>

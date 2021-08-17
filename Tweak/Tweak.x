@@ -1,6 +1,8 @@
 #import "IOSHeaders.h"
 #import "Tweak.h"
 
+BOOL isLS = NO;
+
 void updatePrefs() {
     [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
 
@@ -13,28 +15,49 @@ void updatePrefs() {
 %group TakoTweak
 
 %hook CSCoverSheetViewController
--(void)viewWillAppear:(BOOL)animated {
-    [[TKOController sharedInstance].view prepareForDisplay];
+-(void)viewDidAppear:(BOOL)animated {
     %orig;
-}
-
--(void)viewWillDisappear:(BOOL)animated {
-    [[TKOController sharedInstance].view prepareToHide];
-    %orig;
-}
-%end
-
-%hook SBBacklightController
--(void)setBacklightFactorPending:(float)value {
-    %orig;
-    // Screen is on
-    if(value > 0.0f) {
+    if(!isLS) {
         [[TKOController sharedInstance].view prepareForDisplay];
-    } else {
-       [[TKOController sharedInstance].view prepareToHide];
+        NSLog(@"[TakoTweak]CSCoverSheetViewController did appear ");
     }
 }
+
+-(void)viewDidDisappear:(BOOL)animated {
+    %orig;
+    isLS = NO;
+}
+
+-(void)prepareForUILock {
+    %orig;
+}
+
+-(BOOL)handleLockButtonPress {
+    if(!isLS) {
+        NSLog(@"[TakoTweak] handleLockButtonPress ");
+        [[TKOController sharedInstance] hideAllNotifications];
+        [TKOController sharedInstance].view.selectedBundleID = nil;
+        [[TKOController sharedInstance].view.colView reloadData]; 
+    }
+    
+    isLS = YES;
+    return %orig;
+}
+    
+
+-(void)_displayWillTurnOnWhileOnCoverSheet:(id)arg0 {
+    %orig;
+    [[TKOController sharedInstance].view prepareForDisplay];
+}
+
+-(BOOL)hasVisibleContentToReveal {
+    return YES;
+}
 %end
+
+%hook SBLockScreenManager
+%end
+
 
 %hook CSCombinedListViewController
 -(BOOL)notificationStructuredListViewControllerShouldAllowNotificationHistoryReveal:(id)arg1 {
@@ -46,6 +69,10 @@ void updatePrefs() {
 
 - (void)setRevealed:(BOOL)arg1 { // always reveal notifications
     %orig(YES);
+}
+
+- (BOOL) revealed {
+    return YES;
 }
 %end
 
@@ -142,7 +169,8 @@ void updatePrefs() {
     [[TKOController sharedInstance] insertNotificationRequest:notification];
 }
 
--(void)modifyNotificationRequest:(NCNotificationRequest* )notification {
+-(void) modifyNotificationRequest:(NCNotificationRequest* )notification {
+    NSLog(@"[TakoTweak] modified %@", notification);
     // Probably never lol
     if([TKOController sharedInstance].isTkoCall) return %orig;
     [[TKOController sharedInstance] modifyNotificationRequest:notification];
@@ -151,6 +179,18 @@ void updatePrefs() {
 -(void)removeNotificationRequest:(NCNotificationRequest *)notification {
     if([TKOController sharedInstance].isTkoCall) return %orig;
     [[TKOController sharedInstance] removeNotificationRequest:notification];
+}
+
+%new
+- (NSArray *) allRequests {
+    NSMutableArray *requests = [NSMutableArray new];
+    NSArray *sections = self.masterList.notificationSections;
+    for(NSInteger i = sections.count - 1; i >= 0; i--) {
+        NCNotificationStructuredSectionList *list = sections[i];
+        [requests addObjectsFromArray:list.allNotificationRequests];
+    }
+
+    return requests;
 }
 
 %end
@@ -169,6 +209,7 @@ void updatePrefs() {
 }
 
 -(BOOL)notificationListRevealCoordinatorShouldAllowReveal:(id)arg0 {
+    %orig;
     return YES;
 }
 %end

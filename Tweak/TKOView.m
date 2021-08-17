@@ -85,36 +85,21 @@
 
     if(self.displayBy == DisplayByLastAppNotification && self.lastBundleUpdated) {
 
-        self.selectedBundleID = [self.lastBundleUpdated copy];
-        NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
-        if(cellIndex != NSNotFound) [self collectionView:self.colView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
+        if(![self.selectedBundleID isEqualToString:self.lastBundleUpdated]) {
+            NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
+            if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
+        }
+
+        self.selectedBundleID = [NSString stringWithString:self.lastBundleUpdated];
+        [self.colView reloadData];
+        [[TKOController sharedInstance].nlc revealNotificationHistory:YES animated:YES];
+        self.lastBundleUpdated = nil;
 
     } else if(self.displayBy == DisplayByAllClosed) {
         self.selectedBundleID = nil;
         [self.colView reloadData];
     
-    } else if(self.selectedBundleID && self.displayBy != DisplayByItWasBefore) {
-        NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
-        if(cellIndex != NSNotFound) [self collectionView:self.colView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
-    }
-
-    [[TKOController sharedInstance].nlc revealNotificationHistory:YES animated:YES];
-    [[TKOController sharedInstance].nlc _resetCellWithRevealedActions];
-}
-
-- (void) prepareToHide {
-    // We dont want to do anything
-    if(self.cellsInfo.count == 0 || self.displayBy == DisplayByItWasBefore) return;
-
-    [[TKOController sharedInstance] hideAllNotifications];
-
-    if(self.displayBy == DisplayByLastAppNotification && self.lastBundleUpdated) {
-        NSInteger cellIndex = [self getCellIndexByBundle:self.lastBundleUpdated];
-        if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
-
     } else if(self.selectedBundleID) {
-        NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
-        if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
     }
 }
 
@@ -178,8 +163,6 @@
     TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
     BOOL isSelected = [bundle.ID isEqualToString:self.selectedBundleID];
 
-    self.lastBundleUpdated = nil;
-    
     // We unselect and prevent from being selected
     if(isSelected) {
         self.selectedBundleID = nil;
@@ -197,17 +180,20 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // When cell is selected, we reset the global timer, so the screen is not turned off
     [[objc_getClass("SBIdleTimerGlobalCoordinator") sharedInstance] resetIdleTimer];
+            
 
     // We get cell bundleID and show all notifications for that bundle
     TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
     self.selectedBundleID = [bundle.ID copy];
     [[TKOController sharedInstance] insertAllNotificationsWithBundleID:bundle.ID];
+    [[TKOController sharedInstance].nlc revealNotificationHistory:YES animated:YES];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
     // Hide all notifications from the cell that was just deselected
     TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
     [[TKOController sharedInstance] hideAllNotificationsWithBundleID:bundle.ID];
+    [[TKOController sharedInstance].nlc revealNotificationHistory:NO animated:YES];
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {

@@ -39,6 +39,7 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 @end
 
 @interface CSCoverSheetViewController : UIViewController
+-(BOOL) isInScreenOffMode;
 @end
 
 @interface CSPageViewController : UIViewController
@@ -46,6 +47,7 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 
 @interface SBBacklightController : NSObject
 -(void)setBacklightFactorPending:(float)value;
+- (void)turnOnScreenFullyWithBacklightSource:(long long)arg1;
 @end
 
 @interface BBBulletin : NSObject
@@ -61,6 +63,11 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 
 @interface NCNotificationMasterList : NSObject
 @property (nonatomic,readonly) unsigned long long notificationCount; 
+@property (retain, nonatomic) NSMutableArray *notificationSections;
+@end
+
+@interface NCNotificationStructuredSectionList
+@property (readonly, nonatomic) NSArray *allNotificationRequests;
 @end
 
 @interface NCNotificationListView : NSObject
@@ -68,12 +75,16 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 @end
 
 @interface NCNotificationStructuredListViewController : UIViewController
+@property(nonatomic, retain) NCNotificationMasterList *masterList;
+
 -(void)insertNotificationRequest:(NCNotificationRequest *)arg1;
 -(void)modifyNotificationRequest:(NCNotificationRequest* )arg1;
 -(void)removeNotificationRequest:(NCNotificationRequest *)arg1;
 
 -(void)revealNotificationHistory:(BOOL)arg0 animated:(BOOL)arg1 ;
 -(void)_resetCellWithRevealedActions;
+
+- (NSArray *) allRequests;
 @end
 
 @interface NCNotificationDispatcher : NSObject
@@ -138,4 +149,8 @@ typedef NS_OPTIONS(NSUInteger, MTMaterialOptions) {
 @interface SBIdleTimerGlobalCoordinator : NSObject
 + (id) sharedInstance;
 -(void)resetIdleTimer;
+@end
+
+@interface SBLockScreenManager : NSObject
+- (void)lockUIFromSource:(int)arg1 withOptions:(id)arg2;
 @end
