@@ -2,11 +2,13 @@
 #import <objc/runtime.h>
 
 #import "TKOView.h"
+#import "TKOGroupView.h"
 #import "TKOBundle.h"
 
 @interface TKOController : NSObject
 @property(nonatomic, retain) NSMutableArray *bundles;
 @property(nonatomic, retain) TKOView *view;
+@property(nonatomic, retain) TKOGroupView *groupView;
 
 // Notification list controller
 @property(nonatomic, retain) NCNotificationStructuredListViewController *nlc;

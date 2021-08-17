@@ -2,6 +2,7 @@
 #import "Tweak.h"
 
 BOOL isLS = NO;
+BOOL unavailable = NO;
 
 void updatePrefs() {
     [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
@@ -10,6 +11,10 @@ void updatePrefs() {
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
     [TKOController sharedInstance].view.colView.pagingEnabled = prefUsePaging;
     [[TKOController sharedInstance].view updateAllCells];
+
+    // Grouped
+    [TKOController sharedInstance].groupView.iconsCount = [prefGroupedIconsCount intValue];
+    [[TKOController sharedInstance].groupView reload];
 }
 
 %group TakoTweak
@@ -19,13 +24,13 @@ void updatePrefs() {
     %orig;
     if(!isLS) {
         [[TKOController sharedInstance].view prepareForDisplay];
-        NSLog(@"[TakoTweak]CSCoverSheetViewController did appear ");
     }
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
     %orig;
     isLS = NO;
+    [[TKOController sharedInstance].groupView toggle];
 }
 
 -(void)prepareForUILock {
@@ -34,7 +39,6 @@ void updatePrefs() {
 
 -(BOOL)handleLockButtonPress {
     if(!isLS) {
-        NSLog(@"[TakoTweak] handleLockButtonPress ");
         [[TKOController sharedInstance] hideAllNotifications];
         [TKOController sharedInstance].view.selectedBundleID = nil;
         [[TKOController sharedInstance].view.colView reloadData]; 
@@ -47,17 +51,21 @@ void updatePrefs() {
 
 -(void)_displayWillTurnOnWhileOnCoverSheet:(id)arg0 {
     %orig;
-    [[TKOController sharedInstance].view prepareForDisplay];
+    if(prefGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
+        [[TKOController sharedInstance].groupView update];
+        [TKOController sharedInstance].groupView.hidden = NO;
+        [TKOController sharedInstance].view.hidden = YES;
+        [[TKOController sharedInstance] hideAllNotifications];
+    
+    } else {
+        [[TKOController sharedInstance].view prepareForDisplay];
+    }
 }
 
 -(BOOL)hasVisibleContentToReveal {
     return YES;
 }
 %end
-
-%hook SBLockScreenManager
-%end
-
 
 %hook CSCombinedListViewController
 -(BOOL)notificationStructuredListViewControllerShouldAllowNotificationHistoryReveal:(id)arg1 {
@@ -216,40 +224,60 @@ void updatePrefs() {
 
 %hook CSNotificationAdjunctListViewController
 %property (nonatomic, retain) TKOView *tkoView;
+%property (nonatomic, retain) TKOGroupView *tkoGroupView;
+
 - (void) viewDidLoad {
     %orig;
 
-    if(self.tkoView) return;
-    self.stackView.alignment = UIStackViewAlignmentCenter;
-    // self.stackView.distribution = UIStackViewDistributionFillProportionally;
+    // Group View
+    if(!self.tkoGroupView && prefGroupedIsEnabled) {
+        self.stackView.alignment = UIStackViewAlignmentCenter;
+        self.tkoGroupView = [[TKOGroupView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
 
-    CGFloat height = 0;
-    CGFloat width = [[UIScreen mainScreen] bounds].size.width;
+        self.tkoGroupView.iconsCount = [prefGroupedIconsCount intValue];
+        [self.tkoGroupView reload];
 
-    if([prefCellStyle intValue] == 0)  height = 110; // Default
-    else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
-    else if([prefCellStyle intValue] == 2) height = 100; // Axon grouped
+        [TKOController sharedInstance].groupView = self.tkoGroupView;
+        [self.stackView addArrangedSubview:self.tkoGroupView];
+    }
 
-    self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
-    [TKOController sharedInstance].view = self.tkoView;
-    updatePrefs(); // Todo check this
-    [self.stackView addArrangedSubview:self.tkoView];
+    if(!self.tkoView) {
+        CGFloat height = 0;
+        CGFloat width = [[UIScreen mainScreen] bounds].size.width;
+
+        if([prefCellStyle intValue] == 0)  height = 110; // Default
+        else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
+        else if([prefCellStyle intValue] == 2) height = 100; // Axon grouped
+
+        self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
+        [TKOController sharedInstance].view = self.tkoView;
+        updatePrefs(); // Todo check this
+        [self.stackView addArrangedSubview:self.tkoView];
+    }
 }
 
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
     %orig;
 
+    self.tkoGroupView.hidden = YES;
+    [self.tkoGroupView removeFromSuperview];
+    unavailable = YES;
+
+    [[TKOController sharedInstance].groupView toggle];
     [self.tkoView removeFromSuperview];
-    // [self.stackView addSubview:self.tkoView];
     [self.stackView addArrangedSubview:self.tkoView];
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
+    [self.tkoGroupView removeFromSuperview];
+    [self.stackView addArrangedSubview:self.tkoGroupView];
+
     [self.tkoView removeFromSuperview];
-    // [self.stackView insertArrangedSubview:self.tkoView atIndex:0];
     [self.stackView addArrangedSubview:self.tkoView];
+    
+    unavailable = NO;
 }
 
 %end
@@ -270,6 +298,11 @@ void updatePrefs() {
 
     // Cells
     [preferences registerObject:&prefCellStyle default:@(0) forKey:@"cellStyle"];
+
+
+    // Group
+    [preferences registerBool:&prefGroupedIsEnabled default:NO forKey:@"groupedIsEnabled"];
+    [preferences registerObject:&prefGroupedIconsCount default:@(3) forKey:@"groupedIconsCount"];
 
     updatePrefs();
     %init(TakoTweak);
