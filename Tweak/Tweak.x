@@ -30,7 +30,7 @@ void updatePrefs() {
 -(void)viewDidDisappear:(BOOL)animated {
     %orig;
     isLS = NO;
-    [[TKOController sharedInstance].groupView toggle];
+    [[TKOController sharedInstance].groupView hide];
 }
 
 -(void)prepareForUILock {
@@ -52,11 +52,7 @@ void updatePrefs() {
 -(void)_displayWillTurnOnWhileOnCoverSheet:(id)arg0 {
     %orig;
     if(prefGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
-        [[TKOController sharedInstance].groupView update];
-        [TKOController sharedInstance].groupView.hidden = NO;
-        [TKOController sharedInstance].view.hidden = YES;
-        [[TKOController sharedInstance] hideAllNotifications];
-    
+        [[TKOController sharedInstance].groupView show];
     } else {
         [[TKOController sharedInstance].view prepareForDisplay];
     }
@@ -259,20 +255,23 @@ void updatePrefs() {
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    self.tkoGroupView.hidden = YES;
+    [self.tkoGroupView hide];
     [self.tkoGroupView removeFromSuperview];
-    unavailable = YES;
+    [self.stackView addArrangedSubview:self.tkoGroupView];
 
-    [[TKOController sharedInstance].groupView toggle];
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
+
+    unavailable = YES;
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
+    [self.tkoGroupView show];
     [self.tkoGroupView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoGroupView];
+    [self.tkoGroupView hide];
 
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];

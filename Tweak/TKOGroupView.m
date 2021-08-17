@@ -10,6 +10,8 @@
     self = [super initWithFrame:frame];
 
     self.iconsView = [NSMutableArray arrayWithCapacity:3];
+    self.isVisible = NO;
+    self.hidden = YES;
 
     // View blur
     self.blur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
@@ -22,7 +24,7 @@
     self.width = 20;
     self.iconsCount = 3;
 
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggle)];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hide)];
     [self addGestureRecognizer:tap];
 
     return self;
@@ -58,14 +60,25 @@
     return CGSizeMake(self.frame.size.width, self.frame.size.height);
 }
 
-- (void) toggle {
-    [TKOController sharedInstance].groupView.hidden = YES;
+- (void) show {
+    if(self.isVisible) return [self update];
+    [self update];
+    self.isVisible = YES;
+
+    [[TKOController sharedInstance] hideAllNotifications];
+    self.hidden = NO;
+    [TKOController sharedInstance].view.hidden = YES;
+}
+
+- (void) hide {
+    if(!self.isVisible) return;
+    self.isVisible = NO;
+
+    self.hidden = YES;
     [TKOController sharedInstance].view.hidden = NO;
-    [[TKOController sharedInstance].view prepareForDisplay];
-    [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
+
     [[TKOController sharedInstance].view setNeedsLayout];
     [[TKOController sharedInstance].view layoutIfNeeded];
-    [self invalidateIntrinsicContentSize];
 }
 
 - (void) update {
