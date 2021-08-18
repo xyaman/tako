@@ -83,7 +83,7 @@
             return CGSizeMake(50, 70);
             break;
         case CellStyleAxonGrouped:
-            return CGSizeMake(58, 33);
+            return CGSizeMake(58, 36);
             break;
         case CellStyleFullIcon:
             return CGSizeMake(51, 60);
@@ -190,8 +190,8 @@
     self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:6].active = YES;
     [self.iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [self.iconView.heightAnchor constraintEqualToConstant:20].active = YES;
-    [self.iconView.widthAnchor constraintEqualToConstant:20].active = YES;
+    [self.iconView.heightAnchor constraintEqualToConstant:21].active = YES;
+    [self.iconView.widthAnchor constraintEqualToConstant:21].active = YES;
 
     // Notification count
     self.countLabel = [UILabel new];
@@ -205,8 +205,8 @@
     self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.countLabel.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-6].active = YES;
     [self.countLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [self.countLabel.heightAnchor constraintEqualToConstant:20].active = YES;
-    [self.countLabel.widthAnchor constraintEqualToConstant:20].active = YES;
+    [self.countLabel.heightAnchor constraintEqualToConstant:21].active = YES;
+    [self.countLabel.widthAnchor constraintEqualToConstant:21].active = YES;
 
     self.countLabel.layer.cornerRadius = 10;
     self.countLabel.layer.cornerCurve = kCACornerCurveContinuous;
@@ -235,7 +235,7 @@
        self.iconView.image = self.bundle.icon ?: [UIImage new];
 
     } else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) {
-        self.iconView.image = [self resizeIconTo:CGSizeMake(20, 20)];
+        self.iconView.image = [self resizeIconTo:CGSizeMake(21, 21)];
 
         self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
         self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor];

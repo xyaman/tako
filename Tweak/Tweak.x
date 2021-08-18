@@ -33,12 +33,11 @@ void updatePrefs() {
 -(void)viewDidDisappear:(BOOL)animated {
     %orig;
     isLS = NO;
+    [[TKOController sharedInstance].view prepareToHide];
+
+    // Grouping
     if(prefNCGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) [[TKOController sharedInstance].groupView show];
     else [[TKOController sharedInstance].groupView hide];
-}
-
--(void)prepareForUILock {
-    %orig;
 }
 
 -(BOOL)handleLockButtonPress {
@@ -47,6 +46,9 @@ void updatePrefs() {
         [[TKOController sharedInstance] hideAllNotifications];
         [TKOController sharedInstance].view.selectedBundleID = nil;
         [[TKOController sharedInstance].view.colView reloadData]; 
+    
+    } else {
+        [[TKOController sharedInstance].view prepareToHide];
     }
     
     isLS = YES;
@@ -230,11 +232,12 @@ void updatePrefs() {
 - (void) viewDidLoad {
     %orig;
 
-    self.stackView.alignment = UIStackViewAlignmentCenter;
-    self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+    if(prefForceCentering) self.stackView.alignment = UIStackViewAlignmentCenter;
 
     // Group View
     if(!self.tkoGroupView && (prefLSGroupedIsEnabled || prefNCGroupedIsEnabled)) {
+        self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+
         self.tkoGroupView = [[TKOGroupView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
 
         self.tkoGroupView.iconsCount = [prefGroupedIconsCount intValue];
@@ -298,6 +301,9 @@ void updatePrefs() {
 
     [preferences registerObject:&prefSortBy default:@(0) forKey:@"sortBy"];
     [preferences registerObject:&prefDisplayBy default:@(1) forKey:@"displayBy"];
+
+    // Other options
+    [preferences registerBool:&prefForceCentering default:NO forKey:@"forceCentering"];
 
     // Scroll
     [preferences registerBool:&prefUsePaging default:NO forKey:@"usePaging"];

@@ -80,15 +80,9 @@
     self.hidden = YES;
 
     [TKOController sharedInstance].view.hidden = NO;
-
-    // [[TKOController sharedInstance].view setNeedsLayout];
-    // [[TKOController sharedInstance].view layoutIfNeeded];
-    // [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
+    // [[TKOController sharedInstance].view deselectCurrentCell];
 
     self.superview.frame = CGRectMake(0, 0, 0, 500);
-    // [self.superview sizeToFit];
-    // [self.superview setNeedsLayout];
-    // [self.superview layoutIfNeeded];
 }
 
 - (void) update {

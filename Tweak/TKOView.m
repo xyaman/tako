@@ -85,10 +85,7 @@
 
     if(self.displayBy == DisplayByLastAppNotification && self.lastBundleUpdated) {
 
-        if(![self.selectedBundleID isEqualToString:self.lastBundleUpdated]) {
-            NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
-            if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
-        }
+        if(![self.selectedBundleID isEqualToString:self.lastBundleUpdated]) [self deselectCurrentCell];
 
         self.selectedBundleID = [NSString stringWithString:self.lastBundleUpdated];
         [self.colView reloadData];
@@ -96,11 +93,25 @@
         self.lastBundleUpdated = nil;
 
     } else if(self.displayBy == DisplayByAllClosed) {
+        // [[TKOController sharedInstance] hideAllNotifications];
         self.selectedBundleID = nil;
         [self.colView reloadData];
     
     } else if(self.selectedBundleID) {
     }
+}
+
+- (void) prepareToHide {
+    if(self.displayBy == DisplayByAllClosed) {
+        [[TKOController sharedInstance] hideAllNotifications];
+        self.selectedBundleID = nil;
+        [self.colView reloadData];
+    }
+}
+
+- (void) deselectCurrentCell {
+    NSInteger cellIndex = [self getCellIndexByBundle:self.selectedBundleID];
+    if(cellIndex != NSNotFound) [self collectionView:self.colView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:cellIndex inSection:0]];
 }
 
 - (void) sortCells {

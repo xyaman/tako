@@ -13,6 +13,9 @@ BOOL isEnabled = NO;
 NSNumber *prefSortBy = nil;
 NSNumber *prefDisplayBy = nil;
 
+// Options
+BOOL prefForceCentering = NO;
+
 // Scrolling
 BOOL prefUsePaging = NO;
 

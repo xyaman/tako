@@ -20,6 +20,8 @@
 - (void) updateAllCells; // Called when there is a new cell
 - (void) updateCellWithBundle:(NSString *)bundleID; // Called when only ONE cell was updated
 - (void) prepareForDisplay;
+- (void) prepareToHide;
+- (void) deselectCurrentCell;
 
 // Utils
 - (NSInteger) getCellIndexByBundle:(NSString *)bundleID;

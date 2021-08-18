@@ -33,9 +33,7 @@
     NCNotificationRequest *notif = [req copy];
 
     // [self.notifLock lock];
-
     NSInteger index = [self indexOfBundleID:bundleID]; 
-    NSLog(@"[TakoView] selected: %@", self.view.selectedBundleID);
 
     // bundle doesnt exists
     if(index == NSNotFound) {

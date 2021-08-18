@@ -60,6 +60,7 @@
                 <string>GroupedView</string>
             </dict>
 
+            <!-- Scrolling -->
             <dict>
                 <key>cell</key>
                 <string>PSGroupCell</string>
@@ -181,6 +182,29 @@
                 <key>PostNotification</key>
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
+
+            <!-- Other options -->
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Other options</string>
+                <key>footerText</key>
+                <string>Needs respring.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Force Centering</string>
+                <key>key</key>
+                <string>forceCentering</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+
             <!-- Other -->
             <dict>
                 <key>cell</key>
