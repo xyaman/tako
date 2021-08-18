@@ -230,7 +230,7 @@ void updatePrefs() {
     %orig;
 
     self.stackView.alignment = UIStackViewAlignmentCenter;
-    self.stackView.distribution = UIStackViewDistributionFillProportionally;
+    self.stackView.distribution = UIStackViewDistributionEqualSpacing;
 
     // Group View
     if(!self.tkoGroupView && (prefLSGroupedIsEnabled || prefNCGroupedIsEnabled)) {
@@ -259,36 +259,34 @@ void updatePrefs() {
 }
 
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
+    // Needed for compatibility with groups
+    self.stackView.frame = CGRectMake(0, 0, 0, 0);
     %orig;
 
-    [self.stackView setNeedsLayout];
-    [self.stackView layoutIfNeeded];
-
     if(self.tkoGroupView) {
-        [self.tkoGroupView show];
+        [self.tkoGroupView hide];
         [self.tkoGroupView removeFromSuperview];
-        [self.stackView setNeedsLayout];
-        [self.stackView layoutIfNeeded];
 
         // If user wants group above player
         if(prefGroupAbovePlayer) [self.stackView insertArrangedSubview:self.tkoGroupView atIndex:0];
         else [self.stackView addArrangedSubview:self.tkoGroupView];
+        self.stackView.frame = CGRectMake(0, 0, 0, 0);
     }
 
     [self.tkoView removeFromSuperview];
-    [self.stackView setNeedsLayout];
-    [self.stackView layoutIfNeeded];
-
     [self.stackView addArrangedSubview:self.tkoView];
 
     if(!prefGroupWhenMusic) unavailable = YES;
+
+    // Needed for compatibility with groups 
+    self.stackView.frame = CGRectMake(0, 0, 0, 0);
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
     if(self.tkoGroupView) {
-        self.tkoGroupView.hidden = NO;
+        [self.tkoGroupView hide];
         [self.tkoGroupView removeFromSuperview];
         [self.stackView addArrangedSubview:self.tkoView];
     }
@@ -297,6 +295,9 @@ void updatePrefs() {
     [self.stackView addArrangedSubview:self.tkoView];
     
     if(!prefGroupWhenMusic) unavailable = NO;
+
+    // Needed for compatibility with groups 
+    self.stackView.frame = CGRectMake(0, 0, 0, 0);
 }
 
 %end

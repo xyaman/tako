@@ -64,21 +64,29 @@
     if(self.isVisible) return [self update];
     [self update];
     self.isVisible = YES;
+    self.hidden = NO;
 
     [[TKOController sharedInstance] hideAllNotifications];
-    self.hidden = NO;
     [TKOController sharedInstance].view.hidden = YES;
+
+    self.superview.frame = CGRectMake(0, 0, 0, 0);
 }
 
 - (void) hide {
     if(!self.isVisible) return;
     self.isVisible = NO;
-
     self.hidden = YES;
+
     [TKOController sharedInstance].view.hidden = NO;
 
-    [[TKOController sharedInstance].view setNeedsLayout];
-    [[TKOController sharedInstance].view layoutIfNeeded];
+    // [[TKOController sharedInstance].view setNeedsLayout];
+    // [[TKOController sharedInstance].view layoutIfNeeded];
+    // [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
+
+    self.superview.frame = CGRectMake(0, 0, 0, 0);
+    // [self.superview sizeToFit];
+    [self.superview setNeedsLayout];
+    [self.superview layoutIfNeeded];
 }
 
 - (void) update {
