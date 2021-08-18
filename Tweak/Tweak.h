@@ -20,7 +20,10 @@ BOOL prefUsePaging = NO;
 NSNumber *prefCellStyle = nil;
 
 // Grouped
-BOOL prefGroupedIsEnabled = NO;
+BOOL prefLSGroupedIsEnabled = NO;
+BOOL prefNCGroupedIsEnabled = NO;
+BOOL prefGroupWhenMusic = NO;
+BOOL prefGroupAbovePlayer = NO;
 NSNumber *prefGroupedIconsCount = nil;
 
 /*----------------------

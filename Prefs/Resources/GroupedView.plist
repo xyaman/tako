@@ -19,9 +19,9 @@
                 <key>default</key>
                 <false />
                 <key>label</key>
-                <string>Enabled</string>
+                <string>Enable on LS</string>
                 <key>key</key>
-                <string>groupedIsEnabled</string>
+                <string>LSGroupedIsEnabled</string>
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
             </dict>
@@ -54,6 +54,51 @@
                 <string>1 Máx. Icon</string>
                 <key>PostNotification</key>
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
+            </dict>
+
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Experimental settings</string>
+                <key>footerText</key>
+                <string>This settings might not work properly. They must require respring.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Enable on NC</string>
+                <key>key</key>
+                <string>NCGroupedIsEnabled</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Enable when playing music</string>
+                <key>key</key>
+                <string>groupWhenMusic</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Place above media player</string>
+                <key>key</key>
+                <string>groupAbovePlayer</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
             </dict>
 
 

@@ -22,7 +22,10 @@ void updatePrefs() {
 %hook CSCoverSheetViewController
 -(void)viewDidAppear:(BOOL)animated {
     %orig;
-    if(!isLS) {
+    if(isLS) return;
+    if(prefNCGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
+        [[TKOController sharedInstance].groupView show];
+    } else {
         [[TKOController sharedInstance].view prepareForDisplay];
     }
 }
@@ -39,6 +42,7 @@ void updatePrefs() {
 
 -(BOOL)handleLockButtonPress {
     if(!isLS) {
+        [[TKOController sharedInstance].groupView hide];
         [[TKOController sharedInstance] hideAllNotifications];
         [TKOController sharedInstance].view.selectedBundleID = nil;
         [[TKOController sharedInstance].view.colView reloadData]; 
@@ -51,7 +55,7 @@ void updatePrefs() {
 
 -(void)_displayWillTurnOnWhileOnCoverSheet:(id)arg0 {
     %orig;
-    if(prefGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
+    if(prefLSGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
         [[TKOController sharedInstance].groupView show];
     } else {
         [[TKOController sharedInstance].view prepareForDisplay];
@@ -225,9 +229,11 @@ void updatePrefs() {
 - (void) viewDidLoad {
     %orig;
 
+    self.stackView.alignment = UIStackViewAlignmentCenter;
+    self.stackView.distribution = UIStackViewDistributionFillProportionally;
+
     // Group View
-    if(!self.tkoGroupView && prefGroupedIsEnabled) {
-        self.stackView.alignment = UIStackViewAlignmentCenter;
+    if(!self.tkoGroupView && (prefLSGroupedIsEnabled || prefNCGroupedIsEnabled)) {
         self.tkoGroupView = [[TKOGroupView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
 
         self.tkoGroupView.iconsCount = [prefGroupedIconsCount intValue];
@@ -255,28 +261,42 @@ void updatePrefs() {
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    [self.tkoGroupView hide];
-    [self.tkoGroupView removeFromSuperview];
-    [self.stackView addArrangedSubview:self.tkoGroupView];
+    [self.stackView setNeedsLayout];
+    [self.stackView layoutIfNeeded];
+
+    if(self.tkoGroupView) {
+        [self.tkoGroupView show];
+        [self.tkoGroupView removeFromSuperview];
+        [self.stackView setNeedsLayout];
+        [self.stackView layoutIfNeeded];
+
+        // If user wants group above player
+        if(prefGroupAbovePlayer) [self.stackView insertArrangedSubview:self.tkoGroupView atIndex:0];
+        else [self.stackView addArrangedSubview:self.tkoGroupView];
+    }
 
     [self.tkoView removeFromSuperview];
+    [self.stackView setNeedsLayout];
+    [self.stackView layoutIfNeeded];
+
     [self.stackView addArrangedSubview:self.tkoView];
 
-    unavailable = YES;
+    if(!prefGroupWhenMusic) unavailable = YES;
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    [self.tkoGroupView show];
-    [self.tkoGroupView removeFromSuperview];
-    [self.stackView addArrangedSubview:self.tkoGroupView];
-    [self.tkoGroupView hide];
+    if(self.tkoGroupView) {
+        self.tkoGroupView.hidden = NO;
+        [self.tkoGroupView removeFromSuperview];
+        [self.stackView addArrangedSubview:self.tkoView];
+    }
 
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
     
-    unavailable = NO;
+    if(!prefGroupWhenMusic) unavailable = NO;
 }
 
 %end
@@ -300,7 +320,10 @@ void updatePrefs() {
 
 
     // Group
-    [preferences registerBool:&prefGroupedIsEnabled default:NO forKey:@"groupedIsEnabled"];
+    [preferences registerBool:&prefLSGroupedIsEnabled default:NO forKey:@"LSGroupedIsEnabled"];
+    [preferences registerBool:&prefNCGroupedIsEnabled default:NO forKey:@"NCGroupedIsEnabled"];
+    [preferences registerBool:&prefGroupWhenMusic default:NO forKey:@"groupWhenMusic"];
+    [preferences registerBool:&prefGroupAbovePlayer default:NO forKey:@"groupAbovePlayer"];
     [preferences registerObject:&prefGroupedIconsCount default:@(3) forKey:@"groupedIconsCount"];
 
     updatePrefs();
