@@ -33,7 +33,8 @@ void updatePrefs() {
 -(void)viewDidDisappear:(BOOL)animated {
     %orig;
     isLS = NO;
-    [[TKOController sharedInstance].groupView hide];
+    if(prefNCGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) [[TKOController sharedInstance].groupView show];
+    else [[TKOController sharedInstance].groupView hide];
 }
 
 -(void)prepareForUILock {
@@ -260,18 +261,10 @@ void updatePrefs() {
 
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
     // Needed for compatibility with groups
-    self.stackView.frame = CGRectMake(0, 0, 0, 0);
+    // self.stackView.frame = CGRectMake(0, 0, 0, 0);
     %orig;
 
-    if(self.tkoGroupView) {
-        [self.tkoGroupView hide];
-        [self.tkoGroupView removeFromSuperview];
-
-        // If user wants group above player
-        if(prefGroupAbovePlayer) [self.stackView insertArrangedSubview:self.tkoGroupView atIndex:0];
-        else [self.stackView addArrangedSubview:self.tkoGroupView];
-        self.stackView.frame = CGRectMake(0, 0, 0, 0);
-    }
+    if(self.tkoGroupView) [self.tkoGroupView hide];
 
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
@@ -279,25 +272,18 @@ void updatePrefs() {
     if(!prefGroupWhenMusic) unavailable = YES;
 
     // Needed for compatibility with groups 
-    self.stackView.frame = CGRectMake(0, 0, 0, 0);
+    // self.stackView.frame = CGRectMake(0, 0, 0, 0);
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    if(self.tkoGroupView) {
-        [self.tkoGroupView hide];
-        [self.tkoGroupView removeFromSuperview];
-        [self.stackView addArrangedSubview:self.tkoView];
-    }
+    if(self.tkoGroupView) [self.tkoGroupView hide];
 
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
     
     if(!prefGroupWhenMusic) unavailable = NO;
-
-    // Needed for compatibility with groups 
-    self.stackView.frame = CGRectMake(0, 0, 0, 0);
 }
 
 %end
@@ -324,7 +310,6 @@ void updatePrefs() {
     [preferences registerBool:&prefLSGroupedIsEnabled default:NO forKey:@"LSGroupedIsEnabled"];
     [preferences registerBool:&prefNCGroupedIsEnabled default:NO forKey:@"NCGroupedIsEnabled"];
     [preferences registerBool:&prefGroupWhenMusic default:NO forKey:@"groupWhenMusic"];
-    [preferences registerBool:&prefGroupAbovePlayer default:NO forKey:@"groupAbovePlayer"];
     [preferences registerObject:&prefGroupedIconsCount default:@(3) forKey:@"groupedIconsCount"];
 
     updatePrefs();

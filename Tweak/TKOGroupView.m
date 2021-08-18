@@ -69,7 +69,9 @@
     [[TKOController sharedInstance] hideAllNotifications];
     [TKOController sharedInstance].view.hidden = YES;
 
-    self.superview.frame = CGRectMake(0, 0, 0, 0);
+    self.superview.frame = CGRectMake(0, 0, 0, 500);
+    // [self.superview setNeedsLayout];
+    // [self.superview layoutIfNeeded];
 }
 
 - (void) hide {
@@ -83,10 +85,10 @@
     // [[TKOController sharedInstance].view layoutIfNeeded];
     // [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
 
-    self.superview.frame = CGRectMake(0, 0, 0, 0);
+    self.superview.frame = CGRectMake(0, 0, 0, 500);
     // [self.superview sizeToFit];
-    [self.superview setNeedsLayout];
-    [self.superview layoutIfNeeded];
+    // [self.superview setNeedsLayout];
+    // [self.superview layoutIfNeeded];
 }
 
 - (void) update {

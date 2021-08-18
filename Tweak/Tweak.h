@@ -23,7 +23,6 @@ NSNumber *prefCellStyle = nil;
 BOOL prefLSGroupedIsEnabled = NO;
 BOOL prefNCGroupedIsEnabled = NO;
 BOOL prefGroupWhenMusic = NO;
-BOOL prefGroupAbovePlayer = NO;
 NSNumber *prefGroupedIconsCount = nil;
 
 /*----------------------
