@@ -93,7 +93,7 @@
         self.lastBundleUpdated = nil;
 
     } else if(self.displayBy == DisplayByAllClosed) {
-        // [[TKOController sharedInstance] hideAllNotifications];
+        [[TKOController sharedInstance] hideAllNotifications];
         self.selectedBundleID = nil;
         [self.colView reloadData];
     
@@ -156,7 +156,7 @@
 
     cell.bundle = bundle;
     [cell setSelected:NO];
-    [cell updateColors];
+    [cell update];
 
     if(isSelected) {
         [cell setSelected:YES];

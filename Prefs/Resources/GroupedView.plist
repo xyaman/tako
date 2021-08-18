@@ -36,6 +36,18 @@
                 <string>No respring required</string>
             </dict>
             <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Round Icons</string>
+                <key>key</key>
+                <string>groupRoundedIcons</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+            <dict>
                 <key>cellClass</key>
                 <string>HBStepperTableCell</string>
                 <key>default</key>

@@ -98,8 +98,14 @@
         UIImageView *iconView = self.iconsView[i];
         TKOBundle *bundle = cellsInfo[i];
 
-        iconView.image = bundle.icon;
+        iconView.image = [bundle resizedIconWithSize:CGSizeMake(self.width, self.width)];
         iconView.hidden = NO;
+
+        if(self.roundedIcons) {
+            iconView.clipsToBounds = YES;
+            iconView.layer.cornerRadius = self.width / 2;
+            iconView.layer.cornerCurve = kCACornerCurveContinuous;
+        }
     }
 
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, bundlesCount * (self.width + 5) + 5, self.width + 10);

@@ -60,30 +60,6 @@
                 <string>GroupedView</string>
             </dict>
 
-            <!-- Scrolling -->
-            <dict>
-                <key>cell</key>
-                <string>PSGroupCell</string>
-                <key>label</key>
-                <string>Scrolling</string>
-                <key>footerText</key>
-                <string>No respring required.</string>
-            </dict>
-            <dict>
-                <key>cell</key>
-                <string>PSSwitchCell</string>
-                <key>default</key>
-                <false />
-                <key>label</key>
-                <string>Use paging</string>
-                <key>key</key>
-                <string>usePaging</string>
-                <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>
-                <key>PostNotification</key>
-                <string>com.xyaman.takopreferences/ReloadPrefs</string>
-            </dict>
-
             <!-- Cell style -->
             <dict>
                 <key>cell</key>

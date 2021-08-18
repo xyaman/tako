@@ -23,6 +23,7 @@ BOOL prefUsePaging = NO;
 NSNumber *prefCellStyle = nil;
 
 // Grouped
+BOOL prefGroupRoundedIcons = NO;
 BOOL prefLSGroupedIsEnabled = NO;
 BOOL prefNCGroupedIsEnabled = NO;
 BOOL prefGroupWhenMusic = NO;

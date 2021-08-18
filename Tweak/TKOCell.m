@@ -8,11 +8,13 @@
 @implementation TKOCell
 - (id) initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
+
+    // View settings
     self.layer.cornerRadius = 13;
     self.layer.cornerCurve = kCACornerCurveContinuous;
     self.backgroundColor = [UIColor clearColor];
 
-    // View blur
+    // Blur view
     self.blur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
     self.blur.frame = self.bounds;
     self.blur.layer.cornerRadius = 13;
@@ -219,34 +221,32 @@
     self.countLabel.backgroundColor = [UIColor clearColor];
     self.bottomBar.backgroundColor = [UIColor clearColor];
     self.bundle = nil;
+
+    // Only hide blur for full icon
     if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = YES;
 }
 
-- (UIImage *) resizeIconTo:(CGSize)newSize {
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:newSize];
-    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext){[self.bundle.icon drawInRect:(CGRect) {.origin = CGPointZero, .size = newSize}];}];
-    return [image imageWithRenderingMode:self.bundle.icon.renderingMode];
-}
+- (void) update {
 
-- (void) updateColors {
-    UIColor *appColor = [Kuro getPrimaryColor:self.bundle.icon];
-
+    // Default style
     if([TKOController sharedInstance].cellStyle == CellStyleDefault) {
        self.iconView.image = self.bundle.icon ?: [UIImage new];
 
+    // Axon style
     } else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) {
-        self.iconView.image = [self resizeIconTo:CGSizeMake(21, 21)];
+        self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(21, 21)];
 
-        self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
-        self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor];
+        self.countLabel.backgroundColor = self.bundle.primaryColor;
+        self.countLabel.textColor = self.bundle.foregroundColor;
 
+    // Full icon
     } else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) {
 
-        self.iconView.image = [self resizeIconTo:CGSizeMake(45, 45)];
+        self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(45, 45)];
 
-        self.countLabel.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
-        self.countLabel.textColor = [Kuro isDarkColor:appColor] ? [UIColor whiteColor] : [UIColor blackColor]; 
-        self.bottomBar.backgroundColor = [Kuro isDarkColor:appColor] ? [Kuro darkerColorForColor:appColor] : [Kuro lighterColorForColor:appColor];
+        self.countLabel.backgroundColor = self.bundle.primaryColor;
+        self.countLabel.textColor = self.bundle.foregroundColor;
+        self.bottomBar.backgroundColor = self.bundle.primaryColor;
     }
 
     self.countLabel.text = [NSString stringWithFormat:@"%ld", self.bundle.notifications.count];

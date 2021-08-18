@@ -1,7 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "TKOBundle.h"
 
-#import <Kuro/libKuro.h>
 
 @interface TKOCell : UICollectionViewCell <UIGestureRecognizerDelegate>
 @property(nonatomic, retain) TKOBundle *bundle;
@@ -23,5 +22,5 @@
 @property(nonatomic) CGRect initialFrame;
 
 + (CGSize) cellSize;
-- (void) updateColors;
+- (void) update;
 @end

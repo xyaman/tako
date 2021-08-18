@@ -241,6 +241,7 @@ void updatePrefs() {
         self.tkoGroupView = [[TKOGroupView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
 
         self.tkoGroupView.iconsCount = [prefGroupedIconsCount intValue];
+        self.tkoGroupView.roundedIcons = prefGroupRoundedIcons;
         [self.tkoGroupView reload];
 
         [TKOController sharedInstance].groupView = self.tkoGroupView;
@@ -313,6 +314,7 @@ void updatePrefs() {
 
 
     // Group
+    [preferences registerBool:&prefGroupRoundedIcons default:NO forKey:@"groupRoundedIcons"];
     [preferences registerBool:&prefLSGroupedIsEnabled default:NO forKey:@"LSGroupedIsEnabled"];
     [preferences registerBool:&prefNCGroupedIsEnabled default:NO forKey:@"NCGroupedIsEnabled"];
     [preferences registerBool:&prefGroupWhenMusic default:NO forKey:@"groupWhenMusic"];

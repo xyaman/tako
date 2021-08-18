@@ -25,7 +25,16 @@
         bundle.icon = [sbIcon iconImageWithInfo:(struct SBIconImageInfo){60,60,2,0}];
     }
 
+    bundle.primaryColor = [Kuro getPrimaryColor:bundle.icon];
+    bundle.foregroundColor = [Kuro isDarkColor:bundle.primaryColor] ? [UIColor whiteColor] : [UIColor blackColor];
+
     return bundle;
+}
+
+- (UIImage *) resizedIconWithSize:(CGSize)newSize {
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:newSize];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext){[self.icon drawInRect:(CGRect) {.origin = CGPointZero, .size = newSize}];}];
+    return [image imageWithRenderingMode:self.icon.renderingMode];
 }
 
 - (void) newNotification:(NCNotificationRequest *) req{
