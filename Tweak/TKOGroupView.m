@@ -72,13 +72,11 @@
 
     [[TKOController sharedInstance] hideAllNotifications];
 
+    // Get old frame
     self.oldTkoViewFrame = [TKOController sharedInstance].view.frame;
-    // [TKOController sharedInstance].view.frame = CGRectZero; 
-    // [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
-
     [TKOController sharedInstance].view.hidden = YES;
 
-    if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.x, self.superview.frame.size.width, self.superview.frame.size.height - self.oldTkoViewFrame.size.height);
+    if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.y, self.superview.frame.size.width, self.superview.frame.size.height - self.oldTkoViewFrame.size.height);
 }
 
 - (void) hide {
@@ -87,18 +85,36 @@
 
     [self.taptic selectionChanged];
 
-    self.hidden = YES;
+    // self.hidden = YES;
 
-    [TKOController sharedInstance].view.hidden = NO;
+    // [TKOController sharedInstance].view.hidden = NO;
 
-    [TKOController sharedInstance].view.selectedBundleID = nil;
-    [[TKOController sharedInstance].view.colView reloadData];
+    // [TKOController sharedInstance].view.selectedBundleID = nil;
+    // [[TKOController sharedInstance].view.colView reloadData];
 
-    [self sizeToFit];
-    [self.superview setNeedsLayout];
-    [self.superview layoutIfNeeded];
+        // Animate dissapear
+    [UIView animateWithDuration:0.3
+        animations:^{self.alpha = 0.0;}
+        completion:^(BOOL finished){
+            self.alpha = 1.0;
 
-    if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.x, self.superview.frame.size.width, self.superview.frame.size.height + self.oldTkoViewFrame.size.height);
+            self.hidden = YES;
+            [TKOController sharedInstance].view.hidden = NO;
+            [TKOController sharedInstance].view.selectedBundleID = nil;
+            [[TKOController sharedInstance].view.colView reloadData];
+
+            [self.superview setNeedsLayout];
+            [self.superview layoutIfNeeded]; 
+
+            if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.y, self.superview.frame.size.width, self.superview.frame.size.height + self.oldTkoViewFrame.size.height);
+        }
+    ];
+
+    // [self sizeToFit];
+    // [self.superview setNeedsLayout];
+    // [self.superview layoutIfNeeded];
+
+    // if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.x, self.superview.frame.size.width, self.superview.frame.size.height + self.oldTkoViewFrame.size.height);
 }
 
 - (void) update {

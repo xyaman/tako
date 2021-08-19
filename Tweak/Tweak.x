@@ -84,10 +84,10 @@ void TKOTestNotifications() {
 
 void updatePrefs() {
     [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
+    [TKOController sharedInstance].useStockColoring = prefStockColoring;
 
     [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
-    [TKOController sharedInstance].view.colView.pagingEnabled = prefUsePaging;
     [TKOController sharedInstance].view.colLayout.minimumLineSpacing = [prefCellSpacing floatValue];
     [[TKOController sharedInstance].view updateAllCells];
 
@@ -327,8 +327,8 @@ void updatePrefs() {
 
     // Group View
     if(!self.tkoGroupView && (prefLSGroupedIsEnabled || prefNCGroupedIsEnabled)) {
-        // self.stackView.distribution = UIStackViewDistributionEqualSpacing;
-        self.stackView.distribution = UIStackViewDistributionFill;
+        self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+        // self.stackView.distribution = UIStackViewDistributionFillProportionally;
 
         self.tkoGroupView = [[TKOGroupView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
 
@@ -399,11 +399,11 @@ void updatePrefs() {
     [preferences registerObject:&prefSortBy default:@(0) forKey:@"sortBy"];
     [preferences registerObject:&prefDisplayBy default:@(1) forKey:@"displayBy"];
 
+    // Coloring
+    [preferences registerBool:&prefStockColoring default:NO forKey:@"stockColoring"];
+
     // Other options
     [preferences registerBool:&prefForceCentering default:NO forKey:@"forceCentering"];
-
-    // Scroll
-    [preferences registerBool:&prefUsePaging default:NO forKey:@"usePaging"];
 
     // Cells
     [preferences registerObject:&prefCellStyle default:@(0) forKey:@"cellStyle"];

@@ -2,6 +2,8 @@
 #import <objc/runtime.h>
 #import "TKOController.h"
 
+#import "GcUniversal/GcImageUtils.h"
+
 
 @interface TKOBundle ()
 @end
@@ -17,6 +19,8 @@
     SBIconController *iconController = [objc_getClass("SBIconController") sharedInstance]; 
     SBIcon *sbIcon = [iconController.model applicationIconForBundleIdentifier:bundle.ID];
 
+    
+
     bundle.icon = [sbIcon iconImageWithInfo:(struct SBIconImageInfo){60,60,2,0}];
 
     // Fallback icon is preferences
@@ -25,7 +29,9 @@
         bundle.icon = [sbIcon iconImageWithInfo:(struct SBIconImageInfo){60,60,2,0}];
     }
 
-    bundle.primaryColor = [Kuro getPrimaryColor:bundle.icon];
+    if([TKOController sharedInstance].useStockColoring) bundle.primaryColor = [Kuro getPrimaryColor:[UIImage stockImgForBundleID:bundle.ID]];
+    else bundle.primaryColor = [Kuro getPrimaryColor:bundle.icon];
+
     bundle.foregroundColor = [Kuro isDarkColor:bundle.primaryColor] ? [UIColor whiteColor] : [UIColor blackColor];
 
     return bundle;

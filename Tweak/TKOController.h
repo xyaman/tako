@@ -17,6 +17,7 @@
 
 // Customization
 @property(nonatomic) int cellStyle;
+@property(nonatomic) BOOL useStockColoring;
 
 + (TKOController *) sharedInstance;
 - (void) insertNotificationToNlc:(NCNotificationRequest *)req;

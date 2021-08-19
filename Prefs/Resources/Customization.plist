@@ -38,6 +38,18 @@
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
             </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Stock Icons Coloring</string>
+                <key>key</key>
+                <string>stockColoring</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
 
             <dict>
                 <key>cell</key>
