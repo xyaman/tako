@@ -209,7 +209,7 @@
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
 
-    CGFloat itemSpacing = self.colLayout.minimumInteritemSpacing;
+    CGFloat itemSpacing = self.colLayout.minimumLineSpacing;
     CGFloat cellWidth = self.colLayout.itemSize.width + itemSpacing;
     UIEdgeInsets insets = self.colLayout.sectionInset;
 

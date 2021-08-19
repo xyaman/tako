@@ -48,14 +48,23 @@
                 <string>testNotifications:</string>
             </dict>
 
-            <!-- Grouped -->
             <dict>
                 <key>cell</key>
                 <string>PSGroupCell</string>
                 <key>label</key>
-                <string>Grouped</string>
+                <string>Customization</string>
                 <key>footerText</key>
-                <string>Respring required.</string>
+                <string>Some changes needs respring.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSLinkCell</string>
+                <key>label</key>
+                <string>Customization</string>
+                <key>detail</key>
+                <string>TKOSubListController</string>
+                <key>TKOSub</key>
+                <string>Customization</string>
             </dict>
             <dict>
                 <key>cell</key>
@@ -66,105 +75,6 @@
                 <string>TKOSubListController</string>
                 <key>TKOSub</key>
                 <string>GroupedView</string>
-            </dict>
-
-            <!-- Cell style -->
-            <dict>
-                <key>cell</key>
-                <string>PSGroupCell</string>
-                <key>label</key>
-                <string>Cells style</string>
-                <key>footerText</key>
-                <string>Respring required.</string>
-            </dict>
-            <dict>
-                <key>cell</key>
-                <string>PSSegmentCell</string>
-                <key>validValues</key>
-                <array>
-                    <integer>0</integer>
-                    <integer>1</integer>
-                    <integer>2</integer>
-                </array>
-                <key>validTitles</key>
-                <array>
-                    <string>Tako ugly for now</string>
-                    <string>Axon grouped style</string>
-                    <string>Full Icon</string>
-                </array>
-                <key>default</key>
-                <integer>0</integer>
-                <key>key</key>
-                <string>cellStyle</string>
-                <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>
-            </dict>
-
-
-            <!-- Sort by -->
-            <dict>
-                <key>cell</key>
-                <string>PSGroupCell</string>
-                <key>label</key>
-                <string>Sort nofications apps by</string>
-                <key>footerText</key>
-                <string>No respring required.</string>
-            </dict>
-            <dict>
-                <key>cell</key>
-                <string>PSSegmentCell</string>
-                <key>validValues</key>
-                <array>
-                    <integer>0</integer>
-                    <integer>1</integer>
-                    <integer>2</integer>
-                </array>
-                <key>validTitles</key>
-                <array>
-                    <string>Last Notification</string>
-                    <string>Bundle Name</string>
-                    <string>None</string>
-                </array>
-                <key>default</key>
-                <integer>0</integer>
-                <key>key</key>
-                <string>sortBy</string>
-                <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>
-                <key>PostNotification</key>
-                <string>com.xyaman.takopreferences/ReloadPrefs</string>
-            </dict>
-            <dict>
-                <key>cell</key>
-                <string>PSGroupCell</string>
-                <key>label</key>
-                <string>When Notification Center is opened, select</string>
-                <key>footerText</key>
-                <string>No respring required.</string>
-            </dict>
-            <dict>
-                <key>cell</key>
-                <string>PSSegmentCell</string>
-                <key>validValues</key>
-                <array>
-                    <integer>0</integer>
-                    <integer>1</integer>
-                    <integer>2</integer>
-                </array>
-                <key>validTitles</key>
-                <array>
-                    <string>Previous</string>
-                    <string>Last App</string>
-                    <string>All Closed</string>
-                </array>
-                <key>default</key>
-                <integer>1</integer>
-                <key>key</key>
-                <string>displayBy</string>
-                <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>
-                <key>PostNotification</key>
-                <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
 
             <!-- Other options -->

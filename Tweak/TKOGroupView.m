@@ -13,6 +13,7 @@
     self.iconsView = [NSMutableArray arrayWithCapacity:3];
     self.isVisible = NO;
     self.hidden = YES;
+    self.taptic = [UISelectionFeedbackGenerator new];
 
     // View blur
     self.blur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
@@ -63,42 +64,41 @@
 }
 
 - (void) show {
-    if(self.isVisible) return [self update];
-    [self update];
+    if(self.isVisible) return;
     self.isVisible = YES;
     self.hidden = NO;
+
+    [self update];
 
     [[TKOController sharedInstance] hideAllNotifications];
 
     self.oldTkoViewFrame = [TKOController sharedInstance].view.frame;
-    [TKOController sharedInstance].view.frame = CGRectZero; 
-    [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
-    // [TKOController sharedInstance].view.hidden = YES;
+    // [TKOController sharedInstance].view.frame = CGRectZero; 
+    // [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
 
-    // self.superview.frame = CGRectMake(0, 0, 0, 500);
-    // [self.superview setNeedsLayout];
-    // [self.superview layoutIfNeeded];
+    [TKOController sharedInstance].view.hidden = YES;
+
+    if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.x, self.superview.frame.size.width, self.superview.frame.size.height - self.oldTkoViewFrame.size.height);
 }
 
 - (void) hide {
     if(!self.isVisible) return;
     self.isVisible = NO;
 
-    self.hidden = YES;
-    self.frame = CGRectZero;
-    [self invalidateIntrinsicContentSize];
+    [self.taptic selectionChanged];
 
-    // [TKOController sharedInstance].view.hidden = NO;
-    if(self.oldTkoViewFrame.size.height > 0) [TKOController sharedInstance].view.frame = self.oldTkoViewFrame; 
-    [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
+    self.hidden = YES;
+
+    [TKOController sharedInstance].view.hidden = NO;
 
     [TKOController sharedInstance].view.selectedBundleID = nil;
     [[TKOController sharedInstance].view.colView reloadData];
 
     [self sizeToFit];
+    [self.superview setNeedsLayout];
     [self.superview layoutIfNeeded];
 
-    // self.superview.frame = CGRectMake(0, 0, 0, 500);
+    if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.x, self.superview.frame.size.width, self.superview.frame.size.height + self.oldTkoViewFrame.size.height);
 }
 
 - (void) update {

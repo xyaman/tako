@@ -257,7 +257,7 @@
 
     if(selected) {
         if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = NO;
-        self.backgroundColor = [Kuro getPrimaryColor:self.iconView.image];
+        self.backgroundColor = self.bundle.primaryColor;
     } else {
         if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = YES;
         self.backgroundColor = [UIColor clearColor];

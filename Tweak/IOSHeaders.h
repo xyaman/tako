@@ -176,5 +176,7 @@ typedef NS_OPTIONS(NSUInteger, MTMaterialOptions) {
 @end
 
 @interface SBLockScreenManager : NSObject
-- (void)lockUIFromSource:(int)arg1 withOptions:(id)arg2;
++ (id) sharedInstance;
+- (BOOL) isUILocked;
+- (void) lockUIFromSource:(int)arg1 withOptions:(id)arg2;
 @end

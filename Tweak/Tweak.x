@@ -88,12 +88,25 @@ void updatePrefs() {
     [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
     [TKOController sharedInstance].view.colView.pagingEnabled = prefUsePaging;
+    [TKOController sharedInstance].view.colLayout.minimumLineSpacing = [prefCellSpacing floatValue];
     [[TKOController sharedInstance].view updateAllCells];
 
     // Grouped
     [TKOController sharedInstance].groupView.iconsCount = [prefGroupIconsCount intValue];
     [[TKOController sharedInstance].groupView reload];
 }
+
+%group GroupAuthentication
+%hook SBDashBoardBiometricUnlockController
+- (void)setAuthenticated:(BOOL)arg1 {
+    %orig;
+
+    if(arg1 && isLS) {
+        [[TKOController sharedInstance].groupView hide];
+    }
+}
+%end
+%end
 
 %group TakoTweak
 
@@ -314,7 +327,8 @@ void updatePrefs() {
 
     // Group View
     if(!self.tkoGroupView && (prefLSGroupedIsEnabled || prefNCGroupedIsEnabled)) {
-        self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+        // self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+        self.stackView.distribution = UIStackViewDistributionFill;
 
         self.tkoGroupView = [[TKOGroupView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
 
@@ -346,8 +360,6 @@ void updatePrefs() {
 }
 
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
-    // Needed for compatibility with groups
-    // self.stackView.frame = CGRectMake(0, 0, 0, 0);
     %orig;
 
     if(self.tkoGroupView) [self.tkoGroupView hide];
@@ -356,9 +368,7 @@ void updatePrefs() {
     [self.stackView addArrangedSubview:self.tkoView];
 
     if(!prefGroupWhenMusic) unavailable = YES;
-
-    // Needed for compatibility with groups 
-    // self.stackView.frame = CGRectMake(0, 0, 0, 0);
+    else self.tkoGroupView.needsFrameZero = YES;
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
@@ -370,6 +380,7 @@ void updatePrefs() {
     [self.stackView addArrangedSubview:self.tkoView];
     
     if(!prefGroupWhenMusic) unavailable = NO;
+    else self.tkoGroupView.needsFrameZero = NO;
 }
 
 %end
@@ -396,9 +407,11 @@ void updatePrefs() {
 
     // Cells
     [preferences registerObject:&prefCellStyle default:@(0) forKey:@"cellStyle"];
+    [preferences registerObject:&prefCellSpacing default:@(10) forKey:@"cellSpacing"];
 
 
     // Group
+    [preferences registerBool:&prefGroupAuthentication default:NO forKey:@"groupAuthentication"];
     [preferences registerBool:&prefGroupRoundedIcons default:NO forKey:@"groupRoundedIcons"];
     [preferences registerBool:&prefLSGroupedIsEnabled default:NO forKey:@"LSGroupedIsEnabled"];
     [preferences registerBool:&prefNCGroupedIsEnabled default:NO forKey:@"NCGroupedIsEnabled"];
@@ -406,6 +419,8 @@ void updatePrefs() {
     [preferences registerObject:&prefGroupIconsCount default:@(3) forKey:@"groupedIconsCount"];
     [preferences registerObject:&prefGroupIconSize default:@(20) forKey:@"groupIconSize"];
     [preferences registerObject:&prefGroupIconSpacing default:@(5) forKey:@"groupIconSpacing"];
+
+    if(prefGroupAuthentication && prefLSGroupedIsEnabled) %init(GroupAuthentication);
 
     updatePrefs();
     %init(TakoTweak);

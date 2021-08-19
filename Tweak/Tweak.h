@@ -22,8 +22,10 @@ BOOL prefUsePaging = NO;
 
 // Cell
 NSNumber *prefCellStyle = nil;
+NSNumber *prefCellSpacing = nil;
 
 // Grouped
+BOOL prefGroupAuthentication = NO;
 BOOL prefGroupRoundedIcons = NO;
 BOOL prefLSGroupedIsEnabled = NO;
 BOOL prefNCGroupedIsEnabled = NO;

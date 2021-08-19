@@ -9,9 +9,9 @@
                 <key>cell</key>
                 <string>PSGroupCell</string>
                 <key>label</key>
-                <string>Settings</string>
+                <string>Lockscreen</string>
                 <key>footerText</key>
-                <string>Group your notifications when notification center is closed</string>
+                <string>Group your notifications when notification center is closed.</string>
             </dict>
             <dict>
                 <key>cell</key>
@@ -25,15 +25,27 @@
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
             </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Automatically Hide When Authenticated</string>
+                <key>key</key>
+                <string>groupAuthentication</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
 
             <!-- Settings -->
             <dict>
                 <key>cell</key>
                 <string>PSGroupCell</string>
                 <key>label</key>
-                <string>Settings</string>
+                <string>Customization</string>
                 <key>footerText</key>
-                <string>No respring required</string>
+                <string>Some settings needs respring.</string>
             </dict>
             <dict>
                 <key>cell</key>
@@ -57,21 +69,18 @@
                 <key>key</key>
                 <string>groupedIconsCount</string>
                 <key>label</key>
-                <string>%i Máx. Icons</string>
+                <string>Max. %i Icons</string>
                 <key>max</key>
                 <real>6</real>
                 <key>min</key>
                 <real>1</real>
                 <key>singularLabel</key>
-                <string>1 Máx. Icon</string>
+                <string>1 Max. %i Icon</string>
                 <key>PostNotification</key>
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
 
             <!-- Customization -->
-            <dict>
-
-            </dict>
             <dict>
                 <key>cell</key>
                 <string>PSStaticTextCell</string>
@@ -132,7 +141,7 @@
                 <key>label</key>
                 <string>Experimental settings</string>
                 <key>footerText</key>
-                <string>This settings might not work properly. They must require respring.</string>
+                <string>This settings might not work properly. They require respring.</string>
             </dict>
             <dict>
                 <key>cell</key>

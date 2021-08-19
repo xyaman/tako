@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>items</key>
+        <array>
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>footerText</key>
+                <string>Respring needed.</string>
+            </dict>
+
+            <!-- Cell style -->
+            <dict>
+                <key>cell</key>
+                <string>PSLinkListCell</string>
+                <key>detail</key>
+                <string>PSListItemsController</string>
+                <key>label</key>
+                <string>Cell Style</string>
+                <key>validValues</key>
+                <array>
+                    <integer>0</integer>
+                    <integer>1</integer>
+                    <integer>2</integer>
+                </array>
+                <key>validTitles</key>
+                <array>
+                    <string>Default</string>
+                    <string>Axon grouped style</string>
+                    <string>Full Icon</string>
+                </array>
+                <key>default</key>
+                <real>0</real>
+                <key>key</key>
+                <string>cellStyle</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>footerText</key>
+                <string>No respring needed.</string>
+            </dict>
+
+            <!-- Sort by -->
+            <dict>
+                <key>cell</key>
+                <string>PSLinkListCell</string>
+                <key>detail</key>
+                <string>PSListItemsController</string>
+                <key>label</key>
+                <string>Sort Apps By</string>
+                <key>validValues</key>
+                <array>
+                    <integer>0</integer>
+                    <integer>1</integer>
+                    <integer>2</integer>
+                </array>
+                <key>validTitles</key>
+                <array>
+                    <string>Last Notification</string>
+                    <string>Bundle Name</string>
+                    <string>None</string>
+                </array>
+                <key>default</key>
+                <integer>0</integer>
+                <key>key</key>
+                <string>sortBy</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
+            </dict>
+            
+            <!-- At open show -->
+            <dict>
+                <key>cell</key>
+                <string>PSLinkListCell</string>
+                <key>detail</key>
+                <string>PSListItemsController</string>
+                <key>label</key>
+                <string>At Open Show</string>
+                <key>validValues</key>
+                <array>
+                    <integer>0</integer>
+                    <integer>1</integer>
+                    <integer>2</integer>
+                </array>
+                <key>validTitles</key>
+                <array>
+                    <string>Like It Was Before</string>
+                    <string>Last App Notification</string>
+                    <string>All Cells Closed</string>
+                </array>
+                <key>default</key>
+                <integer>1</integer>
+                <key>key</key>
+                <string>displayBy</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
+            </dict>
+
+            <!-- Visual -->
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Customization</string>
+                <key>footerText</key>
+                <string>No respring needed.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSStaticTextCell</string>
+                <key>label</key>
+                <string>Cells Spacing</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSliderCell</string>
+                <key>default</key>
+                <integer>10</integer>
+                <key>min</key>	
+                <real>0</real>
+                <key>max</key>	
+                <real>30</real>
+                <key>isSegmented</key>
+                <true/>
+                <key>segmentCount</key>
+                <integer>30</integer>
+                <key>showValue</key>
+                <true/>
+                <key>key</key>
+                <string>cellSpacing</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>			
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
+            </dict>
+
+        </array>
+        <key>title</key>
+        <string>Customization</string>
+    </dict>
+</plist>
