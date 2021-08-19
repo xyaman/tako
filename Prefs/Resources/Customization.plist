@@ -24,12 +24,14 @@
                     <integer>0</integer>
                     <integer>1</integer>
                     <integer>2</integer>
+                    <integer>3</integer>
                 </array>
                 <key>validTitles</key>
                 <array>
                     <string>Default</string>
                     <string>Axon grouped style</string>
                     <string>Full Icon</string>
+                    <string>Full Icon w/o Bottom Bar</string>
                 </array>
                 <key>default</key>
                 <real>0</real>

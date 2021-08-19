@@ -92,6 +92,9 @@
         if(bundle.notifications.count == 0) {
             [self.bundles removeObjectAtIndex:index];
             [self.view updateAllCells];
+            
+            // We update group
+            if(self.groupView) [self.groupView update];
     
         } else {
             [self.view updateCellWithBundle:bundleID];

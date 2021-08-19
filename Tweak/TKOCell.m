@@ -75,6 +75,7 @@
     if([TKOController sharedInstance].cellStyle == CellStyleDefault) [self setupUgly];
     else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) [self setupAxonStyle];
     else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) [self setupFullIcon];
+    else if([TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) [self setupFullIconWOBottomBar];
 
     return self;
 }
@@ -89,6 +90,8 @@
             break;
         case CellStyleFullIcon:
             return CGSizeMake(51, 60);
+        case CellStyleFullIconWOBottomBar:
+            return CGSizeMake(51, 51);
     };
 
     return CGSizeZero;
@@ -119,6 +122,45 @@
     [self.countLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
     [self.countLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [self.countLabel.widthAnchor constraintEqualToConstant:self.frame.size.width].active = YES;
+}
+
+- (void) setupAxonStyle {
+
+    self.layer.cornerRadius = 16;
+    self.blur.layer.cornerRadius = 16;
+
+    // Notification app icon
+    self.iconView = [UIImageView new];
+    self.iconView.userInteractionEnabled = NO;
+    [self addSubview:self.iconView];
+
+    self.iconView.layer.cornerRadius = 10;
+    self.iconView.layer.cornerCurve = kCACornerCurveContinuous;
+    self.iconView.clipsToBounds = YES;
+
+    self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:6].active = YES;
+    [self.iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [self.iconView.heightAnchor constraintEqualToConstant:21].active = YES;
+    [self.iconView.widthAnchor constraintEqualToConstant:21].active = YES;
+
+    // Notification count
+    self.countLabel = [UILabel new];
+    self.countLabel.userInteractionEnabled = NO;
+    [self addSubview:self.countLabel];
+
+    self.countLabel.textAlignment = NSTextAlignmentCenter;
+    self.countLabel.clipsToBounds = YES;
+    self.countLabel.font = [UIFont systemFontOfSize:10];
+
+    self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.countLabel.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-6].active = YES;
+    [self.countLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [self.countLabel.heightAnchor constraintEqualToConstant:21].active = YES;
+    [self.countLabel.widthAnchor constraintEqualToConstant:21].active = YES;
+
+    self.countLabel.layer.cornerRadius = 10;
+    self.countLabel.layer.cornerCurve = kCACornerCurveContinuous;
 }
 
 - (void) setupFullIcon {
@@ -175,43 +217,9 @@
     [self.bottomBar.heightAnchor constraintEqualToConstant:5].active = YES;
 }
 
-- (void) setupAxonStyle {
-
-    self.layer.cornerRadius = 16;
-    self.blur.layer.cornerRadius = 16;
-
-    // Notification app icon
-    self.iconView = [UIImageView new];
-    self.iconView.userInteractionEnabled = NO;
-    [self addSubview:self.iconView];
-
-    self.iconView.layer.cornerRadius = 10;
-    self.iconView.layer.cornerCurve = kCACornerCurveContinuous;
-    self.iconView.clipsToBounds = YES;
-
-    self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:6].active = YES;
-    [self.iconView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [self.iconView.heightAnchor constraintEqualToConstant:21].active = YES;
-    [self.iconView.widthAnchor constraintEqualToConstant:21].active = YES;
-
-    // Notification count
-    self.countLabel = [UILabel new];
-    self.countLabel.userInteractionEnabled = NO;
-    [self addSubview:self.countLabel];
-
-    self.countLabel.textAlignment = NSTextAlignmentCenter;
-    self.countLabel.clipsToBounds = YES;
-    self.countLabel.font = [UIFont systemFontOfSize:10];
-
-    self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.countLabel.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-6].active = YES;
-    [self.countLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [self.countLabel.heightAnchor constraintEqualToConstant:21].active = YES;
-    [self.countLabel.widthAnchor constraintEqualToConstant:21].active = YES;
-
-    self.countLabel.layer.cornerRadius = 10;
-    self.countLabel.layer.cornerCurve = kCACornerCurveContinuous;
+- (void) setupFullIconWOBottomBar {
+    [self setupFullIcon];
+    [self.bottomBar removeFromSuperview];
 }
 
 - (void) prepareForReuse {
@@ -223,7 +231,7 @@
     self.bundle = nil;
 
     // Only hide blur for full icon
-    if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = YES;
+    if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) self.blur.hidden = YES;
 }
 
 - (void) update {
@@ -240,7 +248,7 @@
         self.countLabel.textColor = self.bundle.foregroundColor;
 
     // Full icon
-    } else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) {
+    } else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) {
 
         self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(45, 45)];
 
@@ -256,10 +264,10 @@
     [super setSelected:selected];
 
     if(selected) {
-        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = NO;
+        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) self.blur.hidden = NO;
         self.backgroundColor = self.bundle.primaryColor;
     } else {
-        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) self.blur.hidden = YES;
+        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) self.blur.hidden = YES;
         self.backgroundColor = [UIColor clearColor];
     }
 }
@@ -286,7 +294,7 @@
             break;
             
         case UIGestureRecognizerStateChanged:
-            self.frame = CGRectMake(self.initialFrame.origin.x, self.initialFrame.origin.y + movement, self.frame.size.width, self.frame.size.height);
+            self.frame = CGRectMake(self.frame.origin.x, self.initialFrame.origin.y + movement, self.frame.size.width, self.frame.size.height);
             self.closeShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / 30;
             
             self.willBeRemoved = movement >= 30;
@@ -304,14 +312,14 @@
             [self.closeShapeLayer removeFromSuperlayer];
             self.closeView.hidden = YES;
             self.closeShapeLayer.strokeEnd = 0;
-            self.frame = self.initialFrame;
+            self.frame = CGRectMake(self.frame.origin.x, self.initialFrame.origin.y, self.frame.size.width, self.frame.size.height);
             break;
             
         default:
             self.closeView.hidden = YES;
             [self.closeShapeLayer removeFromSuperlayer];
             self.closeShapeLayer.strokeEnd = 0;
-            self.frame = self.initialFrame;
+            self.frame = CGRectMake(self.frame.origin.x, self.initialFrame.origin.y, self.frame.size.width, self.frame.size.height);
             break;
     }
 }

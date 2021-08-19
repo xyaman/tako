@@ -27,6 +27,16 @@
     self.iconsCount = 3;
     self.iconSpacing = 5;
 
+    // More notifications circle
+    // self.moreView = [UILabel new];
+    // self.moreView.userInteractionEnabled = NO;
+    // [self addSubview:self.moreView];
+
+    // self.moreView.textAlignment = NSTextAlignmentCenter;
+    // self.moreView.clipsToBounds = YES;
+    // self.moreView.font = [UIFont systemFontOfSize:10];
+
+    // Tap recognizer
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hide)];
     [self addGestureRecognizer:tap];
 
@@ -109,12 +119,6 @@
             if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.y, self.superview.frame.size.width, self.superview.frame.size.height + self.oldTkoViewFrame.size.height);
         }
     ];
-
-    // [self sizeToFit];
-    // [self.superview setNeedsLayout];
-    // [self.superview layoutIfNeeded];
-
-    // if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.x, self.superview.frame.size.width, self.superview.frame.size.height + self.oldTkoViewFrame.size.height);
 }
 
 - (void) update {
@@ -126,7 +130,7 @@
     for(UIImageView *iconView in self.iconsView) iconView.hidden = YES;
 
     // We 
-    for(NSInteger i = 0; i < cellsInfo.count; i++) {
+    for(NSInteger i = 0; i < bundlesCount; i++) {
         UIImageView *iconView = self.iconsView[i];
         TKOBundle *bundle = cellsInfo[i];
 

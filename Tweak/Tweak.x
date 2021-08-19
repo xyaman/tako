@@ -348,7 +348,7 @@ void updatePrefs() {
 
         if([prefCellStyle intValue] == 0)  height = 110; // Default
         else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
-        else if([prefCellStyle intValue] == 2) height = 100; // Axon grouped
+        else if([prefCellStyle intValue] == 2 || [prefCellStyle intValue] == 3) height = 100; // Full icon
 
         self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
         [TKOController sharedInstance].view = self.tkoView;
