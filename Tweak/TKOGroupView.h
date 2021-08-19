@@ -3,9 +3,12 @@
 @interface TKOGroupView : UIView
 @property(nonatomic, retain) NSMutableArray *iconsView;
 @property(nonatomic) BOOL isVisible;
-@property(nonatomic) NSInteger iconsCount;
-@property(nonatomic) CGFloat width;
+
+// Settings
 @property(nonatomic) BOOL roundedIcons;
+@property(nonatomic) CGFloat width;
+@property(nonatomic) NSInteger iconsCount;
+@property(nonatomic) NSInteger iconSpacing;
 
 @property(nonatomic, retain) UIView *blur;
 

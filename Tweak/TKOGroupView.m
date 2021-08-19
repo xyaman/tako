@@ -3,6 +3,7 @@
 #import "objc/runtime.h"
 
 @interface TKOGroupView ()
+@property(nonatomic) CGRect oldTkoViewFrame;
 @end
 
 @implementation TKOGroupView
@@ -23,6 +24,7 @@
 
     self.width = 20;
     self.iconsCount = 3;
+    self.iconSpacing = 5;
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hide)];
     [self addGestureRecognizer:tap];
@@ -49,8 +51,8 @@
 
         // Frame options
         iconView.translatesAutoresizingMaskIntoConstraints = NO;
-        [iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:5 + (i * self.width + i*5)].active = YES;
-        [iconView.topAnchor constraintEqualToAnchor:self.topAnchor constant:5].active = YES;
+        [iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:self.iconSpacing + (i*self.width + i*self.iconSpacing)].active = YES;
+        [iconView.topAnchor constraintEqualToAnchor:self.topAnchor constant:self.iconSpacing].active = YES;
         [iconView.heightAnchor constraintEqualToConstant:self.width].active = YES;
         [iconView.widthAnchor constraintEqualToConstant:self.width].active = YES;
     }
@@ -67,9 +69,13 @@
     self.hidden = NO;
 
     [[TKOController sharedInstance] hideAllNotifications];
-    [TKOController sharedInstance].view.hidden = YES;
 
-    self.superview.frame = CGRectMake(0, 0, 0, 500);
+    self.oldTkoViewFrame = [TKOController sharedInstance].view.frame;
+    [TKOController sharedInstance].view.frame = CGRectZero; 
+    [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
+    // [TKOController sharedInstance].view.hidden = YES;
+
+    // self.superview.frame = CGRectMake(0, 0, 0, 500);
     // [self.superview setNeedsLayout];
     // [self.superview layoutIfNeeded];
 }
@@ -77,12 +83,22 @@
 - (void) hide {
     if(!self.isVisible) return;
     self.isVisible = NO;
+
     self.hidden = YES;
+    self.frame = CGRectZero;
+    [self invalidateIntrinsicContentSize];
 
-    [TKOController sharedInstance].view.hidden = NO;
-    // [[TKOController sharedInstance].view deselectCurrentCell];
+    // [TKOController sharedInstance].view.hidden = NO;
+    if(self.oldTkoViewFrame.size.height > 0) [TKOController sharedInstance].view.frame = self.oldTkoViewFrame; 
+    [[TKOController sharedInstance].view invalidateIntrinsicContentSize];
 
-    self.superview.frame = CGRectMake(0, 0, 0, 500);
+    [TKOController sharedInstance].view.selectedBundleID = nil;
+    [[TKOController sharedInstance].view.colView reloadData];
+
+    [self sizeToFit];
+    [self.superview layoutIfNeeded];
+
+    // self.superview.frame = CGRectMake(0, 0, 0, 500);
 }
 
 - (void) update {
@@ -108,8 +124,12 @@
         }
     }
 
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, bundlesCount * (self.width + 5) + 5, self.width + 10);
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, bundlesCount * (self.width + self.iconSpacing) + self.iconSpacing, self.width + 2 * self.iconSpacing);
     self.blur.frame = self.bounds;
     [self invalidateIntrinsicContentSize];
 }
+
+// iPad issue
+-(void)setSizeToMimic:(CGSize)arg1 {}
+-(CGSize)sizeToMimic {return self.frame.size;}
 @end

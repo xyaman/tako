@@ -68,6 +68,64 @@
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
 
+            <!-- Customization -->
+            <dict>
+
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSStaticTextCell</string>
+                <key>label</key>
+                <string>Icons Size</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSliderCell</string>
+                <key>default</key>
+                <integer>20</integer>
+                <key>min</key>	
+                <real>0</real>
+                <key>max</key>	
+                <real>40</real>
+                <key>isSegmented</key>
+                <true/>
+                <key>segmentCount</key>
+                <integer>40</integer>
+                <key>showValue</key>
+                <true/>
+                <key>key</key>
+                <string>groupIconSize</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>			
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSStaticTextCell</string>
+                <key>label</key>
+                <string>Icons Spacing</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSliderCell</string>
+                <key>default</key>
+                <integer>5</integer>
+                <key>min</key>	
+                <real>0</real>
+                <key>max</key>	
+                <real>15</real>
+                <key>isSegmented</key>
+                <true/>
+                <key>segmentCount</key>
+                <integer>15</integer>
+                <key>showValue</key>
+                <true/>
+                <key>key</key>
+                <string>groupIconSpacing</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>			
+            </dict>
+
+            <!-- Experimental -->
             <dict>
                 <key>cell</key>
                 <string>PSGroupCell</string>

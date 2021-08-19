@@ -39,6 +39,14 @@
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
             </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSButtonCell</string>
+                <key>label</key>
+                <string>Test notifications</string>
+                <key>action</key>
+                <string>testNotifications:</string>
+            </dict>
 
             <!-- Grouped -->
             <dict>

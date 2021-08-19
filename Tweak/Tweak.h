@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <Cephei/HBPreferences.h>
+#import <dlfcn.h>
 
 #import "TKOController.h"
 
@@ -27,7 +28,9 @@ BOOL prefGroupRoundedIcons = NO;
 BOOL prefLSGroupedIsEnabled = NO;
 BOOL prefNCGroupedIsEnabled = NO;
 BOOL prefGroupWhenMusic = NO;
-NSNumber *prefGroupedIconsCount = nil;
+NSNumber *prefGroupIconsCount = nil;
+NSNumber *prefGroupIconSpacing = nil;
+NSNumber *prefGroupIconSize = nil;
 
 /*----------------------
  / Essential Class definitions

@@ -50,9 +50,33 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 - (void)turnOnScreenFullyWithBacklightSource:(long long)arg1;
 @end
 
+@interface BBAction : NSObject
++ (id)actionWithLaunchBundleID:(id)arg1 callblock:(id)arg2;
+@end
+
 @interface BBBulletin : NSObject
 @property(copy, nonatomic) NSString *title;
 @property(copy, nonatomic) NSString *sectionID;
+@property(nonatomic, copy)NSString* recordID;
+@property(nonatomic, copy)NSString* publisherBulletinID;
+@property(nonatomic, copy)NSString* message;
+@property(nonatomic, retain)NSDate* date;
+@property(assign, nonatomic)BOOL clearable;
+@property(nonatomic)BOOL showsMessagePreview;
+@property(nonatomic, copy)BBAction* defaultAction;
+@property(nonatomic, copy)NSString* bulletinID;
+@property(nonatomic, retain)NSDate* lastInterruptDate;
+@property(nonatomic, retain)NSDate* publicationDate;
+@end
+
+@interface BBServer : NSObject
+- (void)publishBulletin:(BBBulletin *)arg1 destinations:(NSUInteger)arg2 alwaysToLockScreen:(BOOL)arg3;
+- (void)publishBulletin:(id)arg1 destinations:(unsigned long long)arg2;
+@end
+
+@interface SpringBoard : UIApplication
+- (void)_simulateLockButtonPress;
+- (void)_simulateHomeButtonPress;
 @end
 
 @interface NCNotificationRequest : NSObject

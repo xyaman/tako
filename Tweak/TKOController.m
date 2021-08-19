@@ -41,6 +41,9 @@
 
         [self.bundles addObject:newBundle];
         [self.view updateAllCells];
+
+        // Update group
+        if(self.groupView) [self.groupView update];
     
     } else {
         TKOBundle *bundle = self.bundles[index]; 

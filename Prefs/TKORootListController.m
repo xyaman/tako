@@ -36,6 +36,10 @@
 	return _specifiers;
 }
 
+- (void)testNotifications:(id)sender {
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)@"com.xyaman.takopreferences/TestNotifications", nil, nil, true);
+}
+
 - (void)respring:(id)sender {
 	if ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/shuffle.dylib"]) {
         [HBRespringController respringAndReturnTo:[NSURL URLWithString:@"prefs:root=Tweaks&path=Tako"]];
