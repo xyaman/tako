@@ -4,6 +4,8 @@
 #import "TKOCell.h"
 
 @interface TKOView ()
+@property(nonatomic) CGRect initialFrame;
+@property(nonatomic) BOOL willBeRemoved;
 @end
 
 @implementation TKOView
@@ -18,14 +20,13 @@
     self.colLayout.itemSize = [TKOCell cellSize];
     
     // UICollection
-    self.colView = [[UICollectionView alloc]initWithFrame:CGRectZero collectionViewLayout:self.colLayout];
+    self.colView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.colLayout];
     self.colView.clipsToBounds = YES;
     self.colView.delegate = self;
     self.colView.dataSource = self;
     self.colView.backgroundColor = [UIColor clearColor];
     self.colView.showsHorizontalScrollIndicator = NO;
     self.colView.automaticallyAdjustsScrollIndicatorInsets = NO;
-    // self.colView.pagingEnabled = YES;
 
     // Register TKOCell
     [self.colView registerClass:[TKOCell class] forCellWithReuseIdentifier:@"TKOCell"];
@@ -37,15 +38,56 @@
     [self.colView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
     [self.colView.heightAnchor constraintEqualToConstant:self.frame.size.height].active = YES;
 
-    // [self setNeedsLayout];
-    // [self layoutIfNeeded];
-
     // Current cell list info
     self.cellsInfo = [NSMutableArray new];
     self.selectedBundleID = nil;
 
     // Other
-    self.selectionFeedback = [[UISelectionFeedbackGenerator alloc] init];
+    self.selectionFeedback = [UISelectionFeedbackGenerator new];
+    self.notificationFeedback = [UINotificationFeedbackGenerator new];
+    self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    self.panGesture.delegate = self;
+    [self.colView addGestureRecognizer:self.panGesture];
+
+    // Close view
+    self.removeAllView = [UIView new];
+    self.removeAllView.hidden = YES;
+    self.removeAllView.layer.cornerRadius = 15;
+    self.removeAllView.backgroundColor = [UIColor redColor];
+    [self addSubview:self.removeAllView];
+
+    self.removeAllView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.removeAllView.rightAnchor constraintEqualToAnchor:self.leftAnchor constant:-4].active = YES;
+    [self.removeAllView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [self.removeAllView.heightAnchor constraintEqualToConstant:30].active = YES;
+    [self.removeAllView.widthAnchor constraintEqualToConstant:30].active = YES;
+    [self layoutIfNeeded];
+
+    // Close blur
+    UIView *closeBlur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
+    closeBlur.frame = self.removeAllView.bounds;
+    closeBlur.layer.cornerRadius = 15;
+    closeBlur.layer.cornerCurve = kCACornerCurveContinuous;
+    [self.removeAllView addSubview:closeBlur];
+
+    // Close label
+    UILabel *closeText = [UILabel new];
+    closeText.textAlignment = NSTextAlignmentCenter;
+    closeText.backgroundColor = [UIColor clearColor];
+    closeText.frame = self.removeAllView.bounds;
+    closeText.text = @"x";
+    closeText.font = [UIFont systemFontOfSize:12];
+    [self.removeAllView addSubview:closeText];
+    
+    // Close shape
+    self.removeAllShapeLayer = [CAShapeLayer layer];
+    self.removeAllShapeLayer.fillColor = [UIColor clearColor].CGColor;
+    self.removeAllShapeLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.removeAllShapeLayer.lineCap = kCALineCapRound;
+    self.removeAllShapeLayer.lineWidth = 3;
+    self.removeAllShapeLayer.strokeEnd = 0;
+    
+    self.removeAllShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.removeAllView.center radius:15 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
 
     return self;
 }
@@ -127,8 +169,6 @@
         }];
     }
 
-    
-    // // Bundle name
     // else if(self.sortBy == 1 && self.cellsInfo.count > 1) [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"bundleID" ascending:YES], nil]];
 }
 
@@ -191,7 +231,6 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // When cell is selected, we reset the global timer, so the screen is not turned off
     [[objc_getClass("SBIdleTimerGlobalCoordinator") sharedInstance] resetIdleTimer];
-            
 
     // We get cell bundleID and show all notifications for that bundle
     TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
@@ -232,5 +271,58 @@
     return insets;
 }
 
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    [[objc_getClass("SBIdleTimerGlobalCoordinator") sharedInstance] resetIdleTimer];
+
+    // Yes if its not our gesture
+    if(gestureRecognizer != self.panGesture) return YES;
+
+    // Gesture condition
+    CGPoint velocity = [self.panGesture velocityInView:self];
+    return fabs(velocity.x) > fabs(velocity.y) && velocity.x > 0 && self.colView.contentOffset.x <= 0;
+}
+
+- (void) handlePan:(UIPanGestureRecognizer *)gesture {
+    CGPoint translation = [gesture translationInView:self];
+    CGFloat movement = translation.x > 0 ? pow(translation.x, 0.7) : -pow(-translation.x, 0.7);
+
+    switch(gesture.state) {
+        case UIGestureRecognizerStateBegan:
+            self.initialFrame = self.frame;
+            self.willBeRemoved = NO;
+            self.removeAllView.hidden = NO;
+            [self.layer addSublayer:self.removeAllShapeLayer];
+            break;
+            
+        case UIGestureRecognizerStateChanged:
+            self.frame = CGRectMake(self.initialFrame.origin.x + movement, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+            self.removeAllShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / 30;
+
+            self.willBeRemoved = movement >= 30;
+            
+            break;
+            
+        case UIGestureRecognizerStateEnded:
+            if(self.willBeRemoved) {
+                [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeSuccess];
+                [[TKOController sharedInstance] removeAllNotifications];
+            } else {
+                [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeError];
+            } 
+
+            self.frame = CGRectMake(self.initialFrame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+            [self.removeAllShapeLayer removeFromSuperlayer];
+            self.removeAllView.hidden = YES;
+            self.removeAllShapeLayer.strokeEnd = 0;
+            break;
+            
+        default:
+            [self.removeAllShapeLayer removeFromSuperlayer];
+            self.removeAllView.hidden = YES;
+            self.removeAllShapeLayer.strokeEnd = 0;
+            self.frame = CGRectMake(self.initialFrame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+            break;
+    }
+}
 
 @end

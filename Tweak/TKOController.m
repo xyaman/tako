@@ -148,6 +148,10 @@
     [self.view updateAllCells];
 }
 
+- (void) removeAllNotifications {
+    for(NSInteger i = self.bundles.count - 1; i >= 0; i--) [self removeAllNotificationsWithBundleID:((TKOBundle *)self.bundles[i]).ID];
+}
+
 - (void) hideAllNotifications {
     NSArray *requests = [self.nlc allRequests];
     for(int i = requests.count - 1; i >= 0; i--) {

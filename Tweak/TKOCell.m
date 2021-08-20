@@ -60,7 +60,6 @@
     self.closeShapeLayer.strokeEnd = 0;
     
     self.closeShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.closeView.center radius:10 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
-    [self.layer addSublayer:self.closeShapeLayer];
 
 
     // Pan gesture

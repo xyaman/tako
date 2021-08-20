@@ -1,9 +1,13 @@
 #import <UIKit/UIKit.h>
 
-@interface TKOView : UIView <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface TKOView : UIView <UICollectionViewDelegate, UICollectionViewDataSource, UIGestureRecognizerDelegate>
 // Views
 @property(nonatomic, retain) UICollectionView *colView;
 @property(nonatomic, retain) UICollectionViewFlowLayout *colLayout;
+
+// Remove all view
+@property(nonatomic, retain) UIView *removeAllView;
+@property(nonatomic, retain) CAShapeLayer *removeAllShapeLayer;
 
 @property(nonatomic) int displayBy;
 @property(nonatomic) int sortBy;
@@ -15,6 +19,8 @@
 
 // Other
 @property(nonatomic, retain) UISelectionFeedbackGenerator *selectionFeedback;
+@property(nonatomic, retain) UINotificationFeedbackGenerator *notificationFeedback;
+@property(nonatomic, retain) UIPanGestureRecognizer *panGesture;
 
 // Update methods
 - (void) updateAllCells; // Called when there is a new cell
