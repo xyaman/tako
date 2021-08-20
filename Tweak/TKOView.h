@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import "TKOCloseView.h"
 
 @interface TKOView : UIView <UICollectionViewDelegate, UICollectionViewDataSource, UIGestureRecognizerDelegate>
 // Views
@@ -6,7 +7,7 @@
 @property(nonatomic, retain) UICollectionViewFlowLayout *colLayout;
 
 // Remove all view
-@property(nonatomic, retain) UIView *removeAllView;
+@property(nonatomic, retain) TKOCloseView *removeAllView;
 @property(nonatomic, retain) CAShapeLayer *removeAllShapeLayer;
 
 @property(nonatomic) int displayBy;

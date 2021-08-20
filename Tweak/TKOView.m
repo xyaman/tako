@@ -6,6 +6,7 @@
 @interface TKOView ()
 @property(nonatomic) CGRect initialFrame;
 @property(nonatomic) BOOL willBeRemoved;
+@property(nonatomic, retain) NSLayoutConstraint* rightConstraint;
 @end
 
 @implementation TKOView
@@ -50,44 +51,28 @@
     [self.colView addGestureRecognizer:self.panGesture];
 
     // Close view
-    self.removeAllView = [UIView new];
+    self.removeAllView = [TKOCloseView new];
     self.removeAllView.hidden = YES;
-    self.removeAllView.layer.cornerRadius = 15;
-    self.removeAllView.backgroundColor = [UIColor redColor];
     [self addSubview:self.removeAllView];
 
     self.removeAllView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.removeAllView.rightAnchor constraintEqualToAnchor:self.leftAnchor constant:-4].active = YES;
+    self.removeAllView.rightConstraint = [self.removeAllView.rightAnchor constraintEqualToAnchor:self.leftAnchor constant:-4];
+    self.removeAllView.rightConstraint.active = YES;
     [self.removeAllView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [self.removeAllView.heightAnchor constraintEqualToConstant:30].active = YES;
-    [self.removeAllView.widthAnchor constraintEqualToConstant:30].active = YES;
+    [self.removeAllView.heightAnchor constraintEqualToConstant:25].active = YES;
+    [self.removeAllView.widthAnchor constraintEqualToConstant:25].active = YES;
     [self layoutIfNeeded];
 
-    // Close blur
-    UIView *closeBlur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
-    closeBlur.frame = self.removeAllView.bounds;
-    closeBlur.layer.cornerRadius = 15;
-    closeBlur.layer.cornerCurve = kCACornerCurveContinuous;
-    [self.removeAllView addSubview:closeBlur];
-
-    // Close label
-    UILabel *closeText = [UILabel new];
-    closeText.textAlignment = NSTextAlignmentCenter;
-    closeText.backgroundColor = [UIColor clearColor];
-    closeText.frame = self.removeAllView.bounds;
-    closeText.text = @"x";
-    closeText.font = [UIFont systemFontOfSize:12];
-    [self.removeAllView addSubview:closeText];
     
     // Close shape
     self.removeAllShapeLayer = [CAShapeLayer layer];
     self.removeAllShapeLayer.fillColor = [UIColor clearColor].CGColor;
-    self.removeAllShapeLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.removeAllShapeLayer.strokeColor = [UIColor redColor].CGColor;
     self.removeAllShapeLayer.lineCap = kCALineCapRound;
-    self.removeAllShapeLayer.lineWidth = 3;
+    self.removeAllShapeLayer.lineWidth = 2;
     self.removeAllShapeLayer.strokeEnd = 0;
     
-    self.removeAllShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.removeAllView.center radius:15 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
+    self.removeAllShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.removeAllView.center radius:12.5 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
 
     return self;
 }
@@ -261,13 +246,20 @@
     // If the number of cells that exist take up less room than the
     // collection view width, then center the content with the appropriate insets.
     // Otherwise return the default layout inset.
-    if (totalCellWidth > contentWidth) return insets;
+    if (totalCellWidth > contentWidth) {
+        self.removeAllView.rightConstraint.constant = -4;
+        return insets;
+    }
 
 
     // Calculate the right amount of padding to center the cells.
     CGFloat padding = ((contentWidth - totalCellWidth) / 2.0);
     insets.left = padding;
     insets.right = padding;
+
+    // Remove all constraint
+    self.removeAllView.rightConstraint.constant = -4 + padding;
+    [self layoutIfNeeded];
     return insets;
 }
 
@@ -291,15 +283,16 @@
             self.initialFrame = self.frame;
             self.willBeRemoved = NO;
             self.removeAllView.hidden = NO;
+            self.removeAllShapeLayer.frame = self.removeAllView.bounds; // Bug
+            self.removeAllShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.removeAllView.center radius:12.5 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
             [self.layer addSublayer:self.removeAllShapeLayer];
             break;
             
         case UIGestureRecognizerStateChanged:
             self.frame = CGRectMake(self.initialFrame.origin.x + movement, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
-            self.removeAllShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / 30;
+            self.removeAllShapeLayer.strokeEnd = movement >= 35 ? 1 : movement / 35;
 
-            self.willBeRemoved = movement >= 30;
-            
+            self.willBeRemoved = movement >= 35;
             break;
             
         case UIGestureRecognizerStateEnded:

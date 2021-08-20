@@ -22,45 +22,26 @@
     [self addSubview:self.blur];
 
     // Close view
-    self.closeView = [UIView new];
+    self.closeView = [TKOCloseView new];
     self.closeView.hidden = YES;
-    self.closeView.layer.cornerRadius = 10;
-    self.closeView.backgroundColor = [UIColor redColor];
     [self addSubview:self.closeView];
 
     self.closeView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.closeView.bottomAnchor constraintEqualToAnchor:self.blur.topAnchor constant:-4].active = YES;
     [self.closeView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [self.closeView.heightAnchor constraintEqualToConstant:20].active = YES;
-    [self.closeView.widthAnchor constraintEqualToConstant:20].active = YES;
+    [self.closeView.bottomAnchor constraintEqualToAnchor:self.topAnchor constant:-5].active = YES;
+    [self.closeView.heightAnchor constraintEqualToConstant:22].active = YES;
+    [self.closeView.widthAnchor constraintEqualToConstant:22].active = YES;
     [self layoutIfNeeded];
-
-    // Close blur
-    UIView *closeBlur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
-    closeBlur.frame = self.closeView.bounds;
-    closeBlur.layer.cornerRadius = 13;
-    closeBlur.layer.cornerCurve = kCACornerCurveContinuous;
-    [self.closeView addSubview:closeBlur];
-
-    // Close label
-    UILabel *closeText = [UILabel new];
-    closeText.textAlignment = NSTextAlignmentCenter;
-    closeText.backgroundColor = [UIColor clearColor];
-    closeText.frame = self.closeView.bounds;
-    closeText.text = @"x";
-    closeText.font = [UIFont systemFontOfSize:10];
-    [self.closeView addSubview:closeText];
     
     // Close shape
     self.closeShapeLayer = [CAShapeLayer layer];
     self.closeShapeLayer.fillColor = [UIColor clearColor].CGColor;
-    self.closeShapeLayer.strokeColor = [UIColor whiteColor].CGColor;
+    self.closeShapeLayer.strokeColor = [UIColor labelColor].CGColor;
     self.closeShapeLayer.lineCap = kCALineCapRound;
     self.closeShapeLayer.lineWidth = 2;
     self.closeShapeLayer.strokeEnd = 0;
     
-    self.closeShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.closeView.center radius:10 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
-
+    self.closeShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.closeView.center radius:11 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
 
     // Pan gesture
     self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];

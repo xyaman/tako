@@ -1,12 +1,13 @@
 #import <UIKit/UIKit.h>
 #import "TKOBundle.h"
+#import "TKOCloseView.h"
 
 
 @interface TKOCell : UICollectionViewCell <UIGestureRecognizerDelegate>
 @property(nonatomic, retain) TKOBundle *bundle;
 
 // Close view
-@property(nonatomic, retain) UIView *closeView;
+@property(nonatomic, retain) TKOCloseView *closeView;
 @property(nonatomic, retain) CAShapeLayer *closeShapeLayer;
 
 // Main view
