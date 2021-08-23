@@ -32,16 +32,6 @@
     [self.closeView.heightAnchor constraintEqualToConstant:22].active = YES;
     [self.closeView.widthAnchor constraintEqualToConstant:22].active = YES;
     [self layoutIfNeeded];
-    
-    // Close shape
-    self.closeShapeLayer = [CAShapeLayer layer];
-    self.closeShapeLayer.fillColor = [UIColor clearColor].CGColor;
-    self.closeShapeLayer.strokeColor = [UIColor labelColor].CGColor;
-    self.closeShapeLayer.lineCap = kCALineCapRound;
-    self.closeShapeLayer.lineWidth = 2;
-    self.closeShapeLayer.strokeEnd = 0;
-    
-    self.closeShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.closeView.center radius:11 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
 
     // Pan gesture
     self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
@@ -52,10 +42,10 @@
     self.willBeRemoved = NO;
 
     // Setup style
-    if([TKOController sharedInstance].cellStyle == CellStyleDefault) [self setupUgly];
+    if([TKOController sharedInstance].cellStyle == CellStyleDefault) [self setupDefault];
     else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) [self setupAxonStyle];
-    else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) [self setupFullIcon];
-    else if([TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) [self setupFullIconWOBottomBar];
+    else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) [self setupFullIconWOBottomBar];
+    else if([TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) [self setupFullIcon];
 
     return self;
 }
@@ -63,21 +53,21 @@
 + (CGSize) cellSize {
     switch([TKOController sharedInstance].cellStyle) {
         case CellStyleDefault:
-            return CGSizeMake(50, 70);
+            return CGSizeMake(45, 60);
             break;
         case CellStyleAxonGrouped:
             return CGSizeMake(58, 36);
             break;
         case CellStyleFullIcon:
-            return CGSizeMake(51, 60);
-        case CellStyleFullIconWOBottomBar:
-            return CGSizeMake(51, 51);
+            return CGSizeMake(50, 51);
+        case CellStyleFullIconWBottomBar:
+            return CGSizeMake(50, 60);
     };
 
     return CGSizeZero;
 }
 
-- (void) setupUgly {
+- (void) setupDefault {
     
     // Notification app icon
     self.iconView = [UIImageView new];
@@ -96,6 +86,7 @@
     [self addSubview:self.countLabel];
 
     self.countLabel.textAlignment = NSTextAlignmentCenter;
+    self.countLabel.font = [UIFont systemFontOfSize:14];
 
     self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.countLabel.topAnchor constraintEqualToAnchor:self.iconView.bottomAnchor].active = YES;
@@ -159,11 +150,11 @@
     self.iconView.clipsToBounds = YES;
 
     self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.iconView.topAnchor constraintEqualToAnchor:self.topAnchor constant:3].active = YES;
-    [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:3].active = YES;
-    [self.iconView.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-3].active = YES;
-    [self.iconView.heightAnchor constraintEqualToConstant:45].active = YES;
-    [self.iconView.widthAnchor constraintEqualToConstant:45].active = YES;
+    [self.iconView.topAnchor constraintEqualToAnchor:self.topAnchor constant:5].active = YES;
+    [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:5].active = YES;
+    [self.iconView.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-5].active = YES;
+    [self.iconView.heightAnchor constraintEqualToConstant:40].active = YES;
+    [self.iconView.widthAnchor constraintEqualToConstant:40].active = YES;
 
     self.countLabel = [UILabel new];
     self.countLabel.backgroundColor = [UIColor blackColor];
@@ -172,7 +163,7 @@
 
     self.countLabel.textAlignment = NSTextAlignmentCenter;
     self.countLabel.clipsToBounds = YES;
-    self.countLabel.font = [UIFont systemFontOfSize:10];
+    self.countLabel.font = [UIFont systemFontOfSize:11];
 
     self.countLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.countLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:-5].active = YES;
@@ -211,7 +202,7 @@
     self.bundle = nil;
 
     // Only hide blur for full icon
-    if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) self.blur.hidden = YES;
+    if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = YES;
 }
 
 - (void) update {
@@ -228,7 +219,7 @@
         self.countLabel.textColor = self.bundle.foregroundColor;
 
     // Full icon
-    } else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) {
+    } else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) {
 
         self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(45, 45)];
 
@@ -244,10 +235,10 @@
     [super setSelected:selected];
 
     if(selected) {
-        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) self.blur.hidden = NO;
-        self.backgroundColor = self.bundle.primaryColor;
+        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = NO;
+        if([TKOController sharedInstance].useAdaptiveBackground) self.backgroundColor = self.bundle.primaryColor;
     } else {
-        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWOBottomBar) self.blur.hidden = YES;
+        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = YES;
         self.backgroundColor = [UIColor clearColor];
     }
 }
@@ -270,12 +261,11 @@
             self.initialFrame = self.frame;
             self.willBeRemoved = NO;
             self.closeView.hidden = NO;
-            [self.layer addSublayer:self.closeShapeLayer];
             break;
             
         case UIGestureRecognizerStateChanged:
             self.frame = CGRectMake(self.frame.origin.x, self.initialFrame.origin.y + movement, self.frame.size.width, self.frame.size.height);
-            self.closeShapeLayer.strokeEnd = movement >= 30 ? 1 : movement / 30;
+            self.closeView.shapeLayer.strokeEnd = movement >= 30 ? 1 : movement / 30;
             
             self.willBeRemoved = movement >= 30;
             
@@ -283,22 +273,21 @@
             
         case UIGestureRecognizerStateEnded:
             if(self.willBeRemoved) {
-                [self.taptic notificationOccurred:UINotificationFeedbackTypeSuccess];
+                if([TKOController sharedInstance].useHaptic) [self.taptic notificationOccurred:UINotificationFeedbackTypeSuccess];
+
                 // Remove cell
                 [[TKOController sharedInstance] removeAllNotificationsWithBundleID:self.bundle.ID];
             } else {
-                [self.taptic notificationOccurred:UINotificationFeedbackTypeError];
+                if([TKOController sharedInstance].useHaptic) [self.taptic notificationOccurred:UINotificationFeedbackTypeError];
             }
-            [self.closeShapeLayer removeFromSuperlayer];
             self.closeView.hidden = YES;
-            self.closeShapeLayer.strokeEnd = 0;
+            self.closeView.shapeLayer.strokeEnd = 0;
             self.frame = CGRectMake(self.frame.origin.x, self.initialFrame.origin.y, self.frame.size.width, self.frame.size.height);
             break;
             
         default:
             self.closeView.hidden = YES;
-            [self.closeShapeLayer removeFromSuperlayer];
-            self.closeShapeLayer.strokeEnd = 0;
+            self.closeView.shapeLayer.strokeEnd = 0;
             self.frame = CGRectMake(self.frame.origin.x, self.initialFrame.origin.y, self.frame.size.width, self.frame.size.height);
             break;
     }

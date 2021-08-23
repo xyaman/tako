@@ -16,9 +16,11 @@ NSNumber *prefDisplayBy = nil;
 
 // Options
 BOOL prefForceCentering = NO;
+BOOL prefUseHaptic = YES;
 
 // Coloring
 BOOL prefStockColoring = NO;
+BOOL prefUseAdaptiveBackground = YES;
 
 // Cell
 NSNumber *prefCellStyle = nil;

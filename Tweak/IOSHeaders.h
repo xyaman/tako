@@ -17,7 +17,7 @@ typedef NS_ENUM(NSInteger, CellStyle) {
     CellStyleDefault,
     CellStyleAxonGrouped,
     CellStyleFullIcon,
-    CellStyleFullIconWOBottomBar
+    CellStyleFullIconWBottomBar
 };
 //
 

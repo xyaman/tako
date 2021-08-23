@@ -85,6 +85,8 @@ void TKOTestNotifications() {
 void updatePrefs() {
     [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
     [TKOController sharedInstance].useStockColoring = prefStockColoring;
+    [TKOController sharedInstance].useAdaptiveBackground = prefUseAdaptiveBackground;
+    [TKOController sharedInstance].useHaptic = prefUseHaptic;
 
     [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
     [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
@@ -157,19 +159,14 @@ void updatePrefs() {
 }
 
 -(BOOL)hasVisibleContentToReveal {
-    return YES;
+    return [TKOController sharedInstance].bundles.count > 0;
 }
 %end
 
-%hook CSCombinedListViewController
--(BOOL)notificationStructuredListViewControllerShouldAllowNotificationHistoryReveal:(id)arg1 {
-    return YES;
-}
-%end
 
 %hook NCNotificationListView
 
-- (void)setRevealed:(BOOL)arg1 { // always reveal notifications
+- (void)setRevealed:(BOOL)arg1 {
     %orig(YES);
 }
 
@@ -346,9 +343,10 @@ void updatePrefs() {
         CGFloat height = 0;
         CGFloat width = [[UIScreen mainScreen] bounds].size.width;
 
-        if([prefCellStyle intValue] == 0)  height = 110; // Default
+        if([prefCellStyle intValue] == 0)  height = 90; // Default
         else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
-        else if([prefCellStyle intValue] == 2 || [prefCellStyle intValue] == 3) height = 100; // Full icon
+        else if([prefCellStyle intValue] == 2) height = 80; // Full icon
+        else if([prefCellStyle intValue] == 3) height = 90; // Full icon w/ bottom bar
 
         self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
         [TKOController sharedInstance].view = self.tkoView;
@@ -362,25 +360,38 @@ void updatePrefs() {
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    if(self.tkoGroupView) [self.tkoGroupView hide];
+    if(self.tkoGroupView) {
+        [self.tkoGroupView hide];
+    }
 
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
 
     if(!prefGroupWhenMusic) unavailable = YES;
-    else self.tkoGroupView.needsFrameZero = YES;
+    else {
+        self.tkoGroupView.needsFrameZero = YES;
+    }
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    if(self.tkoGroupView) [self.tkoGroupView hide];
+    if(self.tkoGroupView) {
+        [self.tkoGroupView hide];
+        if(prefGroupWhenMusic) self.tkoGroupView.isUpdating = YES;
+    }
 
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
     
     if(!prefGroupWhenMusic) unavailable = NO;
-    else self.tkoGroupView.needsFrameZero = NO;
+    else {
+        // Ugly fix, but this prevent for not updating stackview frame
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            self.tkoGroupView.needsFrameZero = NO;
+            self.tkoGroupView.isUpdating = NO;
+        });
+    }
 }
 
 %end
@@ -401,9 +412,11 @@ void updatePrefs() {
 
     // Coloring
     [preferences registerBool:&prefStockColoring default:NO forKey:@"stockColoring"];
+    [preferences registerBool:&prefUseAdaptiveBackground default:YES forKey:@"useAdaptiveBackground"];
 
     // Other options
     [preferences registerBool:&prefForceCentering default:NO forKey:@"forceCentering"];
+    [preferences registerBool:&prefUseHaptic default:YES forKey:@"useHaptic"];
 
     // Cells
     [preferences registerObject:&prefCellStyle default:@(0) forKey:@"cellStyle"];

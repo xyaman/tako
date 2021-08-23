@@ -29,7 +29,9 @@
 
 // Every time a new notification is received, is redirected to here
 - (void) insertNotificationRequest:(NCNotificationRequest *)req {
-    NSString* bundleID = req.bulletin.sectionID;
+    if(!req.bulletin.sectionID) return;
+
+    NSString* bundleID = [req.bulletin.sectionID copy];
     NCNotificationRequest *notif = [req copy];
 
     // [self.notifLock lock];

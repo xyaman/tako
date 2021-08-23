@@ -33,14 +33,30 @@
     [self.iconView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:7].active = YES;
     [self.iconView.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-7].active = YES;
 
-    self.backgroundColor = [UIColor redColor];
+    // Shape layer
+    self.shapeLayer = [CAShapeLayer layer];
+    self.shapeLayer.fillColor = [UIColor clearColor].CGColor;
+    self.shapeLayer.strokeColor = [UIColor labelColor].CGColor;
+    self.shapeLayer.lineCap = kCALineCapRound;
+    self.shapeLayer.lineWidth = 3;
+    self.shapeLayer.strokeEnd = 0;
 
+    [self.layer addSublayer:self.shapeLayer];
+    
     return self;
 }
 
 - (void) layoutSubviews {
     [super layoutSubviews];
 
+    // Radius
     self.layer.cornerRadius = self.frame.size.width / 2;
+
+    // Shapelayer
+    self.shapeLayer.bounds = self.bounds;
+
+    // Shape layer path
+    CGPoint center = CGPointMake(self.frame.size.width, self.frame.size.height);
+    self.shapeLayer.path = [UIBezierPath bezierPathWithArcCenter:center radius:self.frame.size.width/2 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
 }
 @end

@@ -92,20 +92,20 @@
                 <string>PSSliderCell</string>
                 <key>default</key>
                 <integer>20</integer>
-                <key>min</key>	
+                <key>min</key>
                 <real>0</real>
-                <key>max</key>	
+                <key>max</key>
                 <real>40</real>
                 <key>isSegmented</key>
-                <true/>
+                <true />
                 <key>segmentCount</key>
                 <integer>40</integer>
                 <key>showValue</key>
-                <true/>
+                <true />
                 <key>key</key>
                 <string>groupIconSize</string>
                 <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>			
+                <string>com.xyaman.takopreferences</string>
             </dict>
             <dict>
                 <key>cell</key>
@@ -118,20 +118,41 @@
                 <string>PSSliderCell</string>
                 <key>default</key>
                 <integer>5</integer>
-                <key>min</key>	
+                <key>min</key>
                 <real>0</real>
-                <key>max</key>	
+                <key>max</key>
                 <real>15</real>
                 <key>isSegmented</key>
-                <true/>
+                <true />
                 <key>segmentCount</key>
                 <integer>15</integer>
                 <key>showValue</key>
-                <true/>
+                <true />
                 <key>key</key>
                 <string>groupIconSpacing</string>
                 <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>			
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Other options</string>
+                <key>footerText</key>
+                <string>May be incompatible with other tweaks. Needs respring.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Force Centering</string>
+                <key>key</key>
+                <string>forceCentering</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
             </dict>
 
             <!-- Experimental -->

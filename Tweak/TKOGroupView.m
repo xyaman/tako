@@ -74,7 +74,7 @@
 }
 
 - (void) show {
-    if(self.isVisible) return;
+    if(self.isVisible || self.isUpdating) return;
     self.isVisible = YES;
     self.hidden = NO;
 
@@ -93,16 +93,9 @@
     if(!self.isVisible) return;
     self.isVisible = NO;
 
-    [self.taptic selectionChanged];
+    if([TKOController sharedInstance].useHaptic) [self.taptic selectionChanged];
 
-    // self.hidden = YES;
-
-    // [TKOController sharedInstance].view.hidden = NO;
-
-    // [TKOController sharedInstance].view.selectedBundleID = nil;
-    // [[TKOController sharedInstance].view.colView reloadData];
-
-        // Animate dissapear
+    // Animate dissapear
     [UIView animateWithDuration:0.3
         animations:^{self.alpha = 0.0;}
         completion:^(BOOL finished){

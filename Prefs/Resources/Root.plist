@@ -70,7 +70,7 @@
                 <key>cell</key>
                 <string>PSLinkCell</string>
                 <key>label</key>
-                <string>Grouped View</string>
+                <string>Grouped View (Beta)</string>
                 <key>detail</key>
                 <string>TKOSubListController</string>
                 <key>TKOSub</key>
@@ -84,19 +84,21 @@
                 <key>label</key>
                 <string>Other options</string>
                 <key>footerText</key>
-                <string>Needs respring.</string>
+                <string>No respring needed.</string>
             </dict>
             <dict>
                 <key>cell</key>
                 <string>PSSwitchCell</string>
                 <key>default</key>
-                <false />
+                <true />
                 <key>label</key>
-                <string>Force Centering</string>
+                <string>Use Haptic Feedback</string>
                 <key>key</key>
-                <string>forceCentering</string>
+                <string>useHaptic</string>
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
 
             <!-- Other -->
@@ -120,7 +122,7 @@
                 <key>label</key>
                 <string>Donate me</string>
                 <key>subtitle</key>
-                <string>Help support future development</string>
+                <string>Support my work.</string>
                 <key>url</key>
                 <string>https://paypal.me/xyamandev</string>
             </dict>

@@ -8,7 +8,6 @@
 
 // Close view
 @property(nonatomic, retain) TKOCloseView *closeView;
-@property(nonatomic, retain) CAShapeLayer *closeShapeLayer;
 
 // Main view
 @property(nonatomic, retain) UIImageView *iconView;

@@ -31,7 +31,7 @@
                     <string>Default</string>
                     <string>Axon grouped style</string>
                     <string>Full Icon</string>
-                    <string>Full Icon w/o Bottom Bar</string>
+                    <string>Full Icon w/ Bottom Bar</string>
                 </array>
                 <key>default</key>
                 <real>0</real>
@@ -40,18 +40,7 @@
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
             </dict>
-            <dict>
-                <key>cell</key>
-                <string>PSSwitchCell</string>
-                <key>default</key>
-                <false />
-                <key>label</key>
-                <string>Stock Icons Coloring</string>
-                <key>key</key>
-                <string>stockColoring</string>
-                <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>
-            </dict>
+
 
             <dict>
                 <key>cell</key>
@@ -89,7 +78,7 @@
                 <key>PostNotification</key>
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
-            
+
             <!-- At open show -->
             <dict>
                 <key>cell</key>
@@ -120,6 +109,42 @@
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
 
+            <!-- Coloring -->
+            <dict>
+                <key>cell</key>
+                <string>PSGroupCell</string>
+                <key>label</key>
+                <string>Customization</string>
+                <key>footerText</key>
+                <string>Only use stock coloring require respring.</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <true />
+                <key>label</key>
+                <string>Use Adaptive Background</string>
+                <key>key</key>
+                <string>useAdaptiveBackground</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
+            </dict>
+            <dict>
+                <key>cell</key>
+                <string>PSSwitchCell</string>
+                <key>default</key>
+                <false />
+                <key>label</key>
+                <string>Stock Icons Coloring</string>
+                <key>key</key>
+                <string>stockColoring</string>
+                <key>defaults</key>
+                <string>com.xyaman.takopreferences</string>
+            </dict>
+
             <!-- Visual -->
             <dict>
                 <key>cell</key>
@@ -140,20 +165,20 @@
                 <string>PSSliderCell</string>
                 <key>default</key>
                 <integer>10</integer>
-                <key>min</key>	
+                <key>min</key>
                 <real>0</real>
-                <key>max</key>	
+                <key>max</key>
                 <real>30</real>
                 <key>isSegmented</key>
-                <true/>
+                <true />
                 <key>segmentCount</key>
                 <integer>30</integer>
                 <key>showValue</key>
-                <true/>
+                <true />
                 <key>key</key>
                 <string>cellSpacing</string>
                 <key>defaults</key>
-                <string>com.xyaman.takopreferences</string>			
+                <string>com.xyaman.takopreferences</string>
                 <key>PostNotification</key>
                 <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>

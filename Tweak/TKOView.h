@@ -8,7 +8,6 @@
 
 // Remove all view
 @property(nonatomic, retain) TKOCloseView *removeAllView;
-@property(nonatomic, retain) CAShapeLayer *removeAllShapeLayer;
 
 @property(nonatomic) int displayBy;
 @property(nonatomic) int sortBy;

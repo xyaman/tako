@@ -63,16 +63,7 @@
     [self.removeAllView.widthAnchor constraintEqualToConstant:25].active = YES;
     [self layoutIfNeeded];
 
-    
-    // Close shape
-    self.removeAllShapeLayer = [CAShapeLayer layer];
-    self.removeAllShapeLayer.fillColor = [UIColor clearColor].CGColor;
-    self.removeAllShapeLayer.strokeColor = [UIColor redColor].CGColor;
-    self.removeAllShapeLayer.lineCap = kCALineCapRound;
-    self.removeAllShapeLayer.lineWidth = 2;
-    self.removeAllShapeLayer.strokeEnd = 0;
-    
-    self.removeAllShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.removeAllView.center radius:12.5 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
+    self.removeAllView.shapeLayer.strokeColor = [UIColor redColor].CGColor;
 
     return self;
 }
@@ -153,8 +144,6 @@
             return [b.ID compare:a.ID];
         }];
     }
-
-    // else if(self.sortBy == 1 && self.cellsInfo.count > 1) [self.cellsInfo sortUsingDescriptors:[NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"bundleID" ascending:YES], nil]];
 }
 
 
@@ -194,7 +183,7 @@
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
-    [self.selectionFeedback selectionChanged];
+    if([TKOController sharedInstance].useHaptic) [self.selectionFeedback selectionChanged];
 
     TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
     BOOL isSelected = [bundle.ID isEqualToString:self.selectedBundleID];
@@ -283,36 +272,31 @@
             self.initialFrame = self.frame;
             self.willBeRemoved = NO;
             self.removeAllView.hidden = NO;
-            self.removeAllShapeLayer.frame = self.removeAllView.bounds; // Bug
-            self.removeAllShapeLayer.path = [UIBezierPath bezierPathWithArcCenter:self.removeAllView.center radius:12.5 startAngle:-M_PI/2 endAngle:2* M_PI clockwise:YES].CGPath;
-            [self.layer addSublayer:self.removeAllShapeLayer];
             break;
             
         case UIGestureRecognizerStateChanged:
             self.frame = CGRectMake(self.initialFrame.origin.x + movement, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
-            self.removeAllShapeLayer.strokeEnd = movement >= 35 ? 1 : movement / 35;
+            self.removeAllView.shapeLayer.strokeEnd = movement >= 35 ? 1 : movement / 35;
 
             self.willBeRemoved = movement >= 35;
             break;
             
         case UIGestureRecognizerStateEnded:
             if(self.willBeRemoved) {
-                [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeSuccess];
+                if([TKOController sharedInstance].useHaptic) [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeSuccess];
                 [[TKOController sharedInstance] removeAllNotifications];
             } else {
-                [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeError];
+                if([TKOController sharedInstance].useHaptic) [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeError];
             } 
 
             self.frame = CGRectMake(self.initialFrame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
-            [self.removeAllShapeLayer removeFromSuperlayer];
             self.removeAllView.hidden = YES;
-            self.removeAllShapeLayer.strokeEnd = 0;
+            self.removeAllView.shapeLayer.strokeEnd = 0;
             break;
             
         default:
-            [self.removeAllShapeLayer removeFromSuperlayer];
             self.removeAllView.hidden = YES;
-            self.removeAllShapeLayer.strokeEnd = 0;
+            self.removeAllView.shapeLayer.strokeEnd = 0;
             self.frame = CGRectMake(self.initialFrame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
             break;
     }
