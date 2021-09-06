@@ -112,6 +112,17 @@ void updatePrefs() {
 
 %group TakoTweak
 
+%hook SparkAutoUnlockX
+
+/* The only way I know of... AutoUnlockX */
+
+-(BOOL)externalBlocksUnlock {
+    if ([TKOController sharedInstance].bundles.count > 0) return YES;
+    return %orig;
+}
+
+%end
+
 %hook CSCoverSheetViewController
 -(void)viewDidAppear:(BOOL)animated {
     %orig;
