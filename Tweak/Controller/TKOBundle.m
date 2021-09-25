@@ -4,7 +4,6 @@
 
 #import "GcUniversal/GcImageUtils.h"
 
-
 @interface TKOBundle ()
 @end
 

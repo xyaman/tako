@@ -1,6 +1,7 @@
-#import "TKOGroupView.h"
-#import "TKOController.h"
 #import "objc/runtime.h"
+#import "TKOGroupView.h"
+
+#import "../Controller/TKOController.h"
 
 @interface TKOGroupView ()
 @property(nonatomic) CGRect oldTkoViewFrame;

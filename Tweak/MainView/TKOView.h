@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import "TKOCloseView.h"
+#import "../UI/TKOCloseView.h"
 
 @interface TKOView : UIView <UICollectionViewDelegate, UICollectionViewDataSource, UIGestureRecognizerDelegate>
 // Views

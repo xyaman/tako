@@ -1,8 +1,8 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
-#import "TKOView.h"
-#import "TKOGroupView.h"
+#import "../MainView/TKOView.h"
+#import "../GroupView/TKOGroupView.h"
 #import "TKOBundle.h"
 
 @interface TKOController : NSObject

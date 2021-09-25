@@ -1,6 +1,6 @@
 export ARCHS = arm64 arm64e
 export SYSROOT = $(THEOS)/sdks/iPhoneOS13.0.sdk
-export PREFIX=$(THEOS)/toolchain/Xcode.xctoolchain/usr/bin/
+export PREFIX = $(THEOS)/toolchain/Xcode.xctoolchain/usr/bin/
 export TARGET = iphone:clang:14.5:13.0
 
 INSTALL_TARGET_PROCESSES = SpringBoard

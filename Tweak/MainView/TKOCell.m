@@ -1,6 +1,7 @@
-#import "TKOCell.h"
-#import "TKOController.h"
 #import "objc/runtime.h"
+#import "TKOCell.h"
+
+#import "../Controller/TKOController.h"
 
 @interface TKOCell ()
 @end

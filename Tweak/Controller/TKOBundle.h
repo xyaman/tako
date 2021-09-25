@@ -1,4 +1,4 @@
-#import "IOSHeaders.h"
+#import "../IOSHeaders.h"
 #import <Kuro/libKuro.h>
 
 @interface TKOBundle : NSObject

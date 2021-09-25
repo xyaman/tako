@@ -1,5 +1,5 @@
 #import "TKOController.h"
-#import "IOSHeaders.h"
+#import "../IOSHeaders.h"
 
 @interface TKOController ()
 @end

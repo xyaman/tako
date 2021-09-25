@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
-#import "TKOBundle.h"
-#import "TKOCloseView.h"
+
+#import "../Controller/TKOBundle.h"
+#import "../UI/TKOCloseView.h"
 
 
 @interface TKOCell : UICollectionViewCell <UIGestureRecognizerDelegate>

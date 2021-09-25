@@ -1,7 +1,8 @@
-#import "TKOView.h"
-#import "TKOController.h"
 #import "objc/runtime.h"
+#import "TKOView.h"
 #import "TKOCell.h"
+
+#import "../Controller/TKOController.h"
 
 @interface TKOView ()
 @property(nonatomic) CGRect initialFrame;

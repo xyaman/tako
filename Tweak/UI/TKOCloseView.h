@@ -1,5 +1,5 @@
 #import "UIKit/UIKit.h"
-#import "IOSHeaders.h"
+#import "../IOSHeaders.h"
 
 @interface TKOCloseView : UIView
 @property(nonatomic, retain) CAShapeLayer *shapeLayer;
