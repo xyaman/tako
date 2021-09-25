@@ -1,5 +1,7 @@
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 // Tweak headers
 typedef NS_ENUM(NSInteger, DisplayBy) {
     DisplayByItWasBefore,
@@ -39,6 +41,11 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 @interface NCNotificationListCoalescingControlsCell : UIView
 @end
 
+@interface SBCoverSheetPresentationManager : NSObject
++(SBCoverSheetPresentationManager *) sharedInstance;
+-(void)setCoverSheetPresented:(BOOL)arg1 animated:(BOOL)arg2 withCompletion:(nullable id)arg3 ;
+@end
+
 @interface CSCoverSheetViewController : UIViewController
 -(BOOL) isInScreenOffMode;
 @end
@@ -52,7 +59,7 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 @end
 
 @interface BBAction : NSObject
-+ (id)actionWithLaunchBundleID:(id)arg1 callblock:(id)arg2;
++ (id)actionWithLaunchBundleID:(id)arg1 callblock:(nullable id)arg2;
 @end
 
 @interface BBBulletin : NSObject
@@ -114,7 +121,7 @@ typedef NS_ENUM(NSInteger, CellStyle) {
 
 @interface NCNotificationDispatcher : NSObject
 -(void)removeNotificationSectionWithIdentifier:(id)arg0;
--(void)destination:(id)arg0 requestsClearingNotificationRequests:(id)arg1 ;
+-(void)destination:(nullable id)arg0 requestsClearingNotificationRequests:(id)arg1 ;
 @end
 
 @interface SBNCNotificationDispatcher : NSObject
@@ -181,3 +188,5 @@ typedef NS_OPTIONS(NSUInteger, MTMaterialOptions) {
 - (BOOL) isUILocked;
 - (void) lockUIFromSource:(int)arg1 withOptions:(id)arg2;
 @end
+
+NS_ASSUME_NONNULL_END
