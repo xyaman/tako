@@ -9,9 +9,6 @@
 // Remove all view
 @property(nonatomic, retain) TKOCloseView *removeAllView;
 
-@property(nonatomic) int displayBy;
-@property(nonatomic) int sortBy;
-
 // Cells info related
 @property(nonatomic, retain) NSMutableArray *cellsInfo;
 @property(nonatomic, retain) NSString *lastBundleUpdated;

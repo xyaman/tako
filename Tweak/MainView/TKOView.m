@@ -87,8 +87,10 @@
 
 - (void) updateCellWithBundle:(NSString *)bundleID {
 
+    SortBy sortBy = [TKOController sharedInstance].prefSortBy;
+    
     // If we are sorting by notification count, we need to update all cells again
-    if(self.sortBy == SortByLastestNotification || self.sortBy == SortByNotificationCount) {
+    if(sortBy == SortByLastestNotification || sortBy == SortByNotificationCount) {
         [self updateAllCells];
     
     // Otherwise we only update this cell
@@ -102,7 +104,9 @@
 - (void) prepareForDisplay {
     if(self.cellsInfo.count == 0) return;
 
-    if(self.displayBy == DisplayByLastAppNotification && self.lastBundleUpdated) {
+    DisplayBy displayBy = [TKOController sharedInstance].prefDisplayBy;
+
+    if(displayBy == DisplayByLastAppNotification && self.lastBundleUpdated) {
 
         if(![self.selectedBundleID isEqualToString:self.lastBundleUpdated]) [self deselectCurrentCell];
 
@@ -111,7 +115,7 @@
         [[TKOController sharedInstance].nlc revealNotificationHistory:YES animated:YES];
         self.lastBundleUpdated = nil;
 
-    } else if(self.displayBy == DisplayByAllClosed) {
+    } else if(displayBy == DisplayByAllClosed) {
         [[TKOController sharedInstance] hideAllNotifications];
         self.selectedBundleID = nil;
         [self.colView reloadData];
@@ -121,7 +125,7 @@
 }
 
 - (void) prepareToHide {
-    if(self.displayBy == DisplayByAllClosed) {
+    if([TKOController sharedInstance].prefDisplayBy == DisplayByAllClosed) {
         [[TKOController sharedInstance] hideAllNotifications];
         self.selectedBundleID = nil;
         [self.colView reloadData];
@@ -134,13 +138,17 @@
 }
 
 - (void) sortCells {
-    // Count
-    if(self.sortBy == SortByLastestNotification && self.cellsInfo.count > 1) {
+    
+    SortBy sortBy = [TKOController sharedInstance].prefSortBy;
+
+    // By date
+    if(sortBy == SortByLastestNotification && self.cellsInfo.count > 1) {
         [self.cellsInfo sortUsingComparator:^NSComparisonResult(TKOBundle *a, TKOBundle *b) {
             return [b.lastUpdate compare:a.lastUpdate];
         }];
     
-    } else if(self.sortBy == SortByNotificationCount && self.cellsInfo.count > 1) {
+    // By count
+    } else if(sortBy == SortByNotificationCount && self.cellsInfo.count > 1) {
         [self.cellsInfo sortUsingComparator:^NSComparisonResult(TKOBundle *a, TKOBundle *b) {
             return [b.ID compare:a.ID];
         }];
@@ -184,7 +192,7 @@
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // TKOCell *cell = (TKOCell *)[self.colView cellForItemAtIndexPath:indexPath];
-    if([TKOController sharedInstance].useHaptic) [self.selectionFeedback selectionChanged];
+    if([TKOController sharedInstance].prefUseHaptic) [self.selectionFeedback selectionChanged];
 
     TKOBundle *bundle = self.cellsInfo[indexPath.item]; 
     BOOL isSelected = [bundle.ID isEqualToString:self.selectedBundleID];
@@ -284,10 +292,10 @@
             
         case UIGestureRecognizerStateEnded:
             if(self.willBeRemoved) {
-                if([TKOController sharedInstance].useHaptic) [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeSuccess];
+                if([TKOController sharedInstance].prefUseHaptic) [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeSuccess];
                 [[TKOController sharedInstance] removeAllNotifications];
             } else {
-                if([TKOController sharedInstance].useHaptic) [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeError];
+                if([TKOController sharedInstance].prefUseHaptic) [self.notificationFeedback notificationOccurred:UINotificationFeedbackTypeError];
             } 
 
             self.frame = CGRectMake(self.initialFrame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);

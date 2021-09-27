@@ -1,4 +1,4 @@
-#import "objc/runtime.h"
+#import <objc/runtime.h>
 #import "TKOCell.h"
 
 #import "../Controller/TKOController.h"
@@ -43,16 +43,16 @@
     self.willBeRemoved = NO;
 
     // Setup style
-    if([TKOController sharedInstance].cellStyle == CellStyleDefault) [self setupDefault];
-    else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) [self setupAxonStyle];
-    else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon) [self setupFullIconWOBottomBar];
-    else if([TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) [self setupFullIcon];
+    if([TKOController sharedInstance].prefCellStyle == CellStyleDefault) [self setupDefault];
+    else if([TKOController sharedInstance].prefCellStyle == CellStyleAxonGrouped) [self setupAxonStyle];
+    else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon) [self setupFullIconWOBottomBar];
+    else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) [self setupFullIcon];
 
     return self;
 }
 
 + (CGSize) cellSize {
-    switch([TKOController sharedInstance].cellStyle) {
+    switch([TKOController sharedInstance].prefCellStyle) {
         case CellStyleDefault:
             return CGSizeMake(45, 60);
             break;
@@ -203,24 +203,24 @@
     self.bundle = nil;
 
     // Only hide blur for full icon
-    if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = YES;
+    if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon || [TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = YES;
 }
 
 - (void) update {
 
     // Default style
-    if([TKOController sharedInstance].cellStyle == CellStyleDefault) {
+    if([TKOController sharedInstance].prefCellStyle == CellStyleDefault) {
        self.iconView.image = self.bundle.icon ?: [UIImage new];
 
     // Axon style
-    } else if([TKOController sharedInstance].cellStyle == CellStyleAxonGrouped) {
+    } else if([TKOController sharedInstance].prefCellStyle == CellStyleAxonGrouped) {
         self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(21, 21)];
 
         self.countLabel.backgroundColor = self.bundle.primaryColor;
         self.countLabel.textColor = self.bundle.foregroundColor;
 
     // Full icon
-    } else if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) {
+    } else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon || [TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) {
 
         self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(45, 45)];
 
@@ -236,10 +236,10 @@
     [super setSelected:selected];
 
     if(selected) {
-        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = NO;
-        if([TKOController sharedInstance].useAdaptiveBackground) self.backgroundColor = self.bundle.primaryColor;
+        if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon || [TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = NO;
+        if([TKOController sharedInstance].prefUseAdaptiveBackground) self.backgroundColor = self.bundle.primaryColor;
     } else {
-        if([TKOController sharedInstance].cellStyle == CellStyleFullIcon || [TKOController sharedInstance].cellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = YES;
+        if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon || [TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = YES;
         self.backgroundColor = [UIColor clearColor];
     }
 }
@@ -274,12 +274,12 @@
             
         case UIGestureRecognizerStateEnded:
             if(self.willBeRemoved) {
-                if([TKOController sharedInstance].useHaptic) [self.taptic notificationOccurred:UINotificationFeedbackTypeSuccess];
+                if([TKOController sharedInstance].prefUseHaptic) [self.taptic notificationOccurred:UINotificationFeedbackTypeSuccess];
 
                 // Remove cell
                 [[TKOController sharedInstance] removeAllNotificationsWithBundleID:self.bundle.ID];
             } else {
-                if([TKOController sharedInstance].useHaptic) [self.taptic notificationOccurred:UINotificationFeedbackTypeError];
+                if([TKOController sharedInstance].prefUseHaptic) [self.taptic notificationOccurred:UINotificationFeedbackTypeError];
             }
             self.closeView.hidden = YES;
             self.closeView.shapeLayer.strokeEnd = 0;

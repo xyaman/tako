@@ -13,7 +13,7 @@
 @property(nonatomic) BOOL roundedIcons;
 @property(nonatomic) CGFloat width;
 @property(nonatomic) NSInteger iconsCount;
-@property(nonatomic) NSInteger iconSpacing;
+@property(nonatomic) CGFloat iconSpacing;
 
 @property(nonatomic, retain) UIView *blur;
 

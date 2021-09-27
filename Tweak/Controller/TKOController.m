@@ -1,20 +1,60 @@
+#import <Cephei/HBPreferences.h>
 #import "TKOController.h"
 #import "../IOSHeaders.h"
 
 @interface TKOController ()
 @end
 
-@implementation TKOController
+@implementation TKOController {
+    HBPreferences *_preferences;
+}
+
 + (TKOController *)sharedInstance {
     static TKOController *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[TKOController alloc] init];
-
-        sharedInstance.bundles = [NSMutableArray new];
-        sharedInstance.isTkoCall = NO;
     });
     return sharedInstance;
+}
+
+- (instancetype) init {
+    self = [super init];
+
+    self.bundles = [NSMutableArray new];
+    self.isTkoCall = NO;
+
+    // Preferences
+    _preferences = [[HBPreferences alloc] initWithIdentifier:@"com.xyaman.takopreferences"];
+    [_preferences registerBool:&_isEnabled default:NO forKey:@"isEnabled"];
+    if(!self.isEnabled) { return self; }
+
+    [_preferences registerInteger:&_prefSortBy default:0 forKey:@"sortBy"];
+    [_preferences registerInteger:&_prefDisplayBy default:1 forKey:@"displayBy"];
+
+    // Coloring
+    [_preferences registerBool:&_prefUseStockColoring default:NO forKey:@"stockColoring"];
+    [_preferences registerBool:&_prefUseAdaptiveBackground default:YES forKey:@"useAdaptiveBackground"];
+
+    // Cell options
+    [_preferences registerInteger:&_prefCellStyle default:0 forKey:@"cellStyle"];
+    [_preferences registerFloat:&_prefCellSpacing default:10 forKey:@"cellSpacing"];
+
+    // Group view
+    [_preferences registerBool:&_prefLSGroupIsEnabled default:NO forKey:@"LSGroupedIsEnabled"];
+    [_preferences registerBool:&_prefNCGroupIsEnabled default:NO forKey:@"NCGroupedIsEnabled"];
+    [_preferences registerBool:&_prefGroupAuthentication default:NO forKey:@"groupAuthentication"];
+    [_preferences registerBool:&_prefGroupRoundedIcons default:NO forKey:@"groupRoundedIcons"];
+    [_preferences registerBool:&_prefGroupWhenMusic default:NO forKey:@"groupWhenMusic"];
+    [_preferences registerInteger:&_prefGroupIconsCount default:3 forKey:@"groupedIconsCount"];
+    [_preferences registerFloat:&_prefGroupIconSize default:20 forKey:@"groupIconSize"];
+    [_preferences registerFloat:&_prefGroupIconSpacing default:5 forKey:@"groupIconSpacing"];
+
+    // Miscelaneous
+    [_preferences registerBool:&_prefForceCentering default:NO forKey:@"forceCentering"];
+    [_preferences registerBool:&_prefUseHaptic default:YES forKey:@"useHaptic"];
+
+    return self;
 }
 
 - (NSInteger) indexOfBundleID:(NSString *)bundleID {

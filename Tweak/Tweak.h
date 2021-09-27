@@ -1,39 +1,5 @@
 #import <UIKit/UIKit.h>
-#import <Cephei/HBPreferences.h>
-
-#import "TKOController.h"
-
-/*----------------------
- / Preferences
- -----------------------*/
-
-HBPreferences *preferences = nil;
-BOOL isEnabled = NO;
-
-NSNumber *prefSortBy = nil;
-NSNumber *prefDisplayBy = nil;
-
-// Options
-BOOL prefForceCentering = NO;
-BOOL prefUseHaptic = YES;
-
-// Coloring
-BOOL prefStockColoring = NO;
-BOOL prefUseAdaptiveBackground = YES;
-
-// Cell
-NSNumber *prefCellStyle = nil;
-NSNumber *prefCellSpacing = nil;
-
-// Grouped
-BOOL prefGroupAuthentication = NO;
-BOOL prefGroupRoundedIcons = NO;
-BOOL prefLSGroupedIsEnabled = NO;
-BOOL prefNCGroupedIsEnabled = NO;
-BOOL prefGroupWhenMusic = NO;
-NSNumber *prefGroupIconsCount = nil;
-NSNumber *prefGroupIconSpacing = nil;
-NSNumber *prefGroupIconSize = nil;
+#import "Controller/TKOController.h"
 
 /*----------------------
  / Essential Class definitions

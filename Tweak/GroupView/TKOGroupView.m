@@ -44,7 +44,13 @@
     return self;
 }
 
+// This loads all settings and set up imageviews
 - (void) reload {
+
+    self.iconsCount = [TKOController sharedInstance].prefGroupIconsCount;
+    self.roundedIcons = [TKOController sharedInstance].prefGroupRoundedIcons;
+    self.iconSpacing = [TKOController sharedInstance].prefGroupIconSpacing;
+    self.width = [TKOController sharedInstance].prefGroupIconSize;
 
     for(UIImageView *iconView in self.iconsView) [iconView removeFromSuperview];
 
@@ -94,7 +100,7 @@
     if(!self.isVisible) return;
     self.isVisible = NO;
 
-    if([TKOController sharedInstance].useHaptic) [self.taptic selectionChanged];
+    if([TKOController sharedInstance].prefUseHaptic) [self.taptic selectionChanged];
 
     // Animate dissapear
     [UIView animateWithDuration:0.3
@@ -123,7 +129,7 @@
     // First we hide all icons
     for(UIImageView *iconView in self.iconsView) iconView.hidden = YES;
 
-    // We 
+    // Configure each image view
     for(NSInteger i = 0; i < bundlesCount; i++) {
         UIImageView *iconView = self.iconsView[i];
         TKOBundle *bundle = cellsInfo[i];

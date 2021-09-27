@@ -6,19 +6,7 @@ BOOL unavailable = NO;
 
 
 void updatePrefs() {
-    [TKOController sharedInstance].cellStyle = [prefCellStyle intValue];
-    [TKOController sharedInstance].useStockColoring = prefStockColoring;
-    [TKOController sharedInstance].useAdaptiveBackground = prefUseAdaptiveBackground;
-    [TKOController sharedInstance].useHaptic = prefUseHaptic;
-
-    [TKOController sharedInstance].view.displayBy = [prefDisplayBy intValue];
-    [TKOController sharedInstance].view.sortBy = [prefSortBy intValue];
-    [TKOController sharedInstance].view.colLayout.minimumLineSpacing = [prefCellSpacing floatValue];
-    [[TKOController sharedInstance].view updateAllCells];
-
-    // Grouped
-    [TKOController sharedInstance].groupView.iconsCount = [prefGroupIconsCount intValue];
-    [[TKOController sharedInstance].groupView reload];
+    // TODO
 }
 
 %group GroupAuthentication
@@ -50,7 +38,7 @@ void updatePrefs() {
 -(void)viewDidAppear:(BOOL)animated {
     %orig;
     if(isLS) return;
-    if(prefNCGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
+    if([TKOController sharedInstance].prefNCGroupIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
         [[TKOController sharedInstance].groupView show];
     } else {
         [[TKOController sharedInstance].view prepareForDisplay];
@@ -63,7 +51,7 @@ void updatePrefs() {
     [[TKOController sharedInstance].view prepareToHide];
 
     // Grouping
-    if(prefNCGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) [[TKOController sharedInstance].groupView show];
+    if([TKOController sharedInstance].prefNCGroupIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) [[TKOController sharedInstance].groupView show];
     else [[TKOController sharedInstance].groupView hide];
 }
 
@@ -85,7 +73,7 @@ void updatePrefs() {
 
 -(void)_displayWillTurnOnWhileOnCoverSheet:(id)arg0 {
     %orig;
-    if(prefLSGroupedIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
+    if([TKOController sharedInstance].prefLSGroupIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
         [[TKOController sharedInstance].groupView show];
     } else {
         [[TKOController sharedInstance].view prepareForDisplay];
@@ -94,77 +82,6 @@ void updatePrefs() {
 
 -(BOOL)hasVisibleContentToReveal {
     return [TKOController sharedInstance].bundles.count > 0;
-}
-%end
-
-
-%hook NCNotificationListView
-
-- (void)setRevealed:(BOOL)arg1 {
-    %orig(YES);
-}
-
-- (BOOL) revealed {
-    return YES;
-}
-%end
-
-
-// History notifications
-%hook NCNotificationListSectionHeaderView
-- (void) didMoveToWindow {
-    self.hidden = YES;
-}
-- (CGRect) frame {
-    return CGRectMake(0, 0, 0, 0);
-}
-- (BOOL) hidden {
-    return YES;
-}
-%end
-
-// Hide older notifications
-%hook NCNotificationListSectionRevealHintView
-- (void) didMoveToWindow {
-    self.hidden = YES;
-}
-
-- (CGRect) frame {
-    return CGRectMake(0, 0, 0, 0);
-}
-
-- (BOOL) hidden {
-    return YES;
-}
-%end
-
-// Hide controls on stack notifications
-%hook NCNotificationListCoalescingHeaderCell
-- (void) didMoveToWindow {
-    self.hidden = YES;
-}
-
-- (CGRect) frame {
-    return CGRectMake(0, 0, 0, 0);
-}
-
-- (BOOL) hidden {
-    return YES;
-}
-%end
-
-// Hide controls on stack notifications
-%hook NCNotificationListCoalescingControlsCell
-- (void) didMoveToWindow {
-    self.hidden = YES;
-}
-
-- (CGRect) frame {
-    return CGRectMake(0, 0, 0, 0);
-}
-
-- (BOOL) hidden {
-    return YES;
 }
 %end
 
@@ -203,7 +120,6 @@ void updatePrefs() {
 }
 
 -(void) modifyNotificationRequest:(NCNotificationRequest* )notification {
-    NSLog(@"[TakoTweak] modified %@", notification);
     // Probably never lol
     if([TKOController sharedInstance].isTkoCall) return %orig;
     [[TKOController sharedInstance] modifyNotificationRequest:notification];
@@ -236,51 +152,25 @@ void updatePrefs() {
 - (unsigned long long) notificationCount {
     return [TKOController sharedInstance].bundles.count;
 }
-
--(BOOL)shouldAllowNotificationHistoryReveal{
-    return YES;
-}
-
--(BOOL)notificationListRevealCoordinatorShouldAllowReveal:(id)arg0 {
-    %orig;
-    return YES;
-}
 %end
 
 %hook CSNotificationAdjunctListViewController
 %property (nonatomic, retain) TKOView *tkoView;
-%property (nonatomic, retain) TKOGroupView *tkoGroupView;
 
 - (void) viewDidLoad {
     %orig;
 
-    if(prefForceCentering) self.stackView.alignment = UIStackViewAlignmentCenter;
+    if([TKOController sharedInstance].prefForceCentering) self.stackView.alignment = UIStackViewAlignmentCenter;
 
-    // Group View
-    if(!self.tkoGroupView && (prefLSGroupedIsEnabled || prefNCGroupedIsEnabled)) {
-        self.stackView.distribution = UIStackViewDistributionEqualSpacing;
-        // self.stackView.distribution = UIStackViewDistributionFillProportionally;
-
-        self.tkoGroupView = [[TKOGroupView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-
-        self.tkoGroupView.iconsCount = [prefGroupIconsCount intValue];
-        self.tkoGroupView.roundedIcons = prefGroupRoundedIcons;
-        self.tkoGroupView.iconSpacing = [prefGroupIconSpacing intValue];
-        self.tkoGroupView.width = [prefGroupIconSize intValue];
-        [self.tkoGroupView reload];
-
-        [TKOController sharedInstance].groupView = self.tkoGroupView;
-        [self.stackView addArrangedSubview:self.tkoGroupView];
-    }
-
+    // This method shouldn't be called more than once, but just in case.
     if(!self.tkoView) {
         CGFloat height = 0;
         CGFloat width = [[UIScreen mainScreen] bounds].size.width;
 
-        if([prefCellStyle intValue] == 0)  height = 90; // Default
-        else if([prefCellStyle intValue] == 1) height = 65; // Axon grouped
-        else if([prefCellStyle intValue] == 2) height = 80; // Full icon
-        else if([prefCellStyle intValue] == 3) height = 90; // Full icon w/ bottom bar
+        if([TKOController sharedInstance].prefCellStyle == 0)  height = 90; // Default
+        else if([TKOController sharedInstance].prefCellStyle == 1) height = 65; // Axon grouped
+        else if([TKOController sharedInstance].prefCellStyle == 2) height = 80; // Full icon
+        else if([TKOController sharedInstance].prefCellStyle == 3) height = 90; // Full icon w/ bottom bar
 
         self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
         [TKOController sharedInstance].view = self.tkoView;
@@ -294,6 +184,7 @@ void updatePrefs() {
 -(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
     %orig;
 
+    // TODO: Split this
     if(self.tkoGroupView) {
         [self.tkoGroupView hide];
     }
@@ -301,7 +192,7 @@ void updatePrefs() {
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
 
-    if(!prefGroupWhenMusic) unavailable = YES;
+    if(![TKOController sharedInstance].prefGroupWhenMusic) unavailable = YES;
     else {
         self.tkoGroupView.needsFrameZero = YES;
     }
@@ -312,13 +203,13 @@ void updatePrefs() {
 
     if(self.tkoGroupView) {
         [self.tkoGroupView hide];
-        if(prefGroupWhenMusic) self.tkoGroupView.isUpdating = YES;
+        if([TKOController sharedInstance].prefGroupWhenMusic) self.tkoGroupView.isUpdating = YES;
     }
 
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
     
-    if(!prefGroupWhenMusic) unavailable = NO;
+    if(![TKOController sharedInstance].prefGroupWhenMusic) unavailable = NO;
     else {
         // Ugly fix, but this prevent for not updating stackview frame
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -332,41 +223,12 @@ void updatePrefs() {
 %end
 
 %ctor {
-    %init; // For notifications
-
-    preferences = [[HBPreferences alloc] initWithIdentifier:@"com.xyaman.takopreferences"];
-    [preferences registerBool:&isEnabled default:NO forKey:@"isEnabled"];
-    if(!isEnabled) return;
+    if(![TKOController sharedInstance].isEnabled) return;
 
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updatePrefs, (CFStringRef)@"com.xyaman.takopreferences/ReloadPrefs", NULL, (CFNotificationSuspensionBehavior)kNilOptions);
 
-    [preferences registerObject:&prefSortBy default:@(0) forKey:@"sortBy"];
-    [preferences registerObject:&prefDisplayBy default:@(1) forKey:@"displayBy"];
-
-    // Coloring
-    [preferences registerBool:&prefStockColoring default:NO forKey:@"stockColoring"];
-    [preferences registerBool:&prefUseAdaptiveBackground default:YES forKey:@"useAdaptiveBackground"];
-
-    // Other options
-    [preferences registerBool:&prefForceCentering default:NO forKey:@"forceCentering"];
-    [preferences registerBool:&prefUseHaptic default:YES forKey:@"useHaptic"];
-
-    // Cells
-    [preferences registerObject:&prefCellStyle default:@(0) forKey:@"cellStyle"];
-    [preferences registerObject:&prefCellSpacing default:@(10) forKey:@"cellSpacing"];
-
-
     // Group
-    [preferences registerBool:&prefGroupAuthentication default:NO forKey:@"groupAuthentication"];
-    [preferences registerBool:&prefGroupRoundedIcons default:NO forKey:@"groupRoundedIcons"];
-    [preferences registerBool:&prefLSGroupedIsEnabled default:NO forKey:@"LSGroupedIsEnabled"];
-    [preferences registerBool:&prefNCGroupedIsEnabled default:NO forKey:@"NCGroupedIsEnabled"];
-    [preferences registerBool:&prefGroupWhenMusic default:NO forKey:@"groupWhenMusic"];
-    [preferences registerObject:&prefGroupIconsCount default:@(3) forKey:@"groupedIconsCount"];
-    [preferences registerObject:&prefGroupIconSize default:@(20) forKey:@"groupIconSize"];
-    [preferences registerObject:&prefGroupIconSpacing default:@(5) forKey:@"groupIconSpacing"];
-
-    if(prefGroupAuthentication && prefLSGroupedIsEnabled) %init(GroupAuthentication);
+    if([TKOController sharedInstance].prefGroupAuthentication && [TKOController sharedInstance].prefLSGroupedIsEnabled) %init(GroupAuthentication);
 
     updatePrefs();
     %init(TakoTweak);
