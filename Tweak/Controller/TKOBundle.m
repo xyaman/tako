@@ -28,7 +28,7 @@
         bundle.icon = [sbIcon iconImageWithInfo:(struct SBIconImageInfo){60,60,2,0}];
     }
 
-    if([TKOController sharedInstance].useStockColoring) bundle.primaryColor = [Kuro getPrimaryColor:[UIImage stockImgForBundleID:bundle.ID]];
+    if([TKOController sharedInstance].prefUseStockColoring) bundle.primaryColor = [Kuro getPrimaryColor:[UIImage stockImgForBundleID:bundle.ID]];
     else bundle.primaryColor = [Kuro getPrimaryColor:bundle.icon];
 
     bundle.foregroundColor = [Kuro isDarkColor:bundle.primaryColor] ? [UIColor whiteColor] : [UIColor blackColor];

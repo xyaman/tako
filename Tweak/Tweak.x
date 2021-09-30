@@ -1,67 +1,52 @@
 #import "IOSHeaders.h"
+#import "Hooks/Shared.h"
 #import "Tweak.h"
 
 BOOL isLS = NO;
-BOOL unavailable = NO;
-
-
-void updatePrefs() {
-    // TODO
-}
-
-%group GroupAuthentication
-%hook SBDashBoardBiometricUnlockController
-- (void)setAuthenticated:(BOOL)arg1 {
-    %orig;
-
-    if(arg1 && isLS) {
-        [[TKOController sharedInstance].groupView hide];
-    }
-}
-%end
-%end
 
 %group TakoTweak
 
-%hook SparkAutoUnlockX
-
-/* The only way I know of... AutoUnlockX */
-
+%hook SparkAutoUnlockX // From axon repo
 -(BOOL)externalBlocksUnlock {
     if ([TKOController sharedInstance].bundles.count > 0) return YES;
     return %orig;
 }
-
 %end
+
+/* So iOS notifications works this way:
+ *
+ * If there are notifications being displayed and screen is OFF when viewDidAppear
+ * is called, the notifications may be moved to history (and because how the Tweak is
+ * build, this may lead to some notifications just disappear).
+ *
+ * So we need to found a method that is called that indicates us that the screen is off,
+ * and also that is called before viewDidAppear (or viewWillAppear)
+ * In this case "handleLockButtonPress" works (only when user locks the device using lock button,
+ * for now it is just okay)
+ */
 
 %hook CSCoverSheetViewController
 -(void)viewDidAppear:(BOOL)animated {
     %orig;
-    if(isLS) return;
-    if([TKOController sharedInstance].prefNCGroupIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
-        [[TKOController sharedInstance].groupView show];
-    } else {
-        [[TKOController sharedInstance].view prepareForDisplay];
-    }
+    if(!isLS) [[TKOController sharedInstance].view prepareForDisplay];
 }
 
+// Also called when device is unlocked and we are out of LS
 -(void)viewDidDisappear:(BOOL)animated {
     %orig;
     isLS = NO;
     [[TKOController sharedInstance].view prepareToHide];
-
-    // Grouping
-    if([TKOController sharedInstance].prefNCGroupIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) [[TKOController sharedInstance].groupView show];
-    else [[TKOController sharedInstance].groupView hide];
 }
 
 -(BOOL)handleLockButtonPress {
+    // This block is called when device is unlocked and is going to be locked. (we are entering to LS)
     if(!isLS) {
         [[TKOController sharedInstance].groupView hide];
         [[TKOController sharedInstance] hideAllNotifications];
         [TKOController sharedInstance].view.selectedBundleID = nil;
         [[TKOController sharedInstance].view.colView reloadData]; 
     
+    // We are already on LS
     } else {
         [[TKOController sharedInstance].view prepareToHide];
     }
@@ -70,14 +55,10 @@ void updatePrefs() {
     return %orig;
 }
     
-
+// Called every time screen is turned ON (so we are always on LS)
 -(void)_displayWillTurnOnWhileOnCoverSheet:(id)arg0 {
     %orig;
-    if([TKOController sharedInstance].prefLSGroupIsEnabled && !unavailable && [TKOController sharedInstance].bundles.count > 0) {
-        [[TKOController sharedInstance].groupView show];
-    } else {
-        [[TKOController sharedInstance].view prepareForDisplay];
-    }
+    [[TKOController sharedInstance].view prepareForDisplay];
 }
 
 -(BOOL)hasVisibleContentToReveal {
@@ -86,63 +67,6 @@ void updatePrefs() {
 %end
 
 
-%hook SBNCNotificationDispatcher
--(id)init {
-    %orig;
-    [TKOController sharedInstance].dispatcher = self.dispatcher;
-    return self;
-}
-
--(void)setDispatcher:(NCNotificationDispatcher *)arg1 {
-    %orig;
-    [TKOController sharedInstance].dispatcher = arg1;
-}
-%end
-
-%hook NCNotificationStructuredListViewController
-- (id) init {
-    id orig = %orig;
-    [TKOController sharedInstance].nlc = self; // Save an instance of this class
-    return orig;
-}
-
--(BOOL)notificationMasterListShouldAllowNotificationHistoryReveal:(id)arg1 {
-    return YES;
-}
-
--(void)insertNotificationRequest:(NCNotificationRequest *)notification {
-    if([TKOController sharedInstance].isTkoCall) {
-        %orig;
-        [self revealNotificationHistory:YES animated:YES];
-        return;
-    }
-    [[TKOController sharedInstance] insertNotificationRequest:notification];
-}
-
--(void) modifyNotificationRequest:(NCNotificationRequest* )notification {
-    // Probably never lol
-    if([TKOController sharedInstance].isTkoCall) return %orig;
-    [[TKOController sharedInstance] modifyNotificationRequest:notification];
-}
-
--(void)removeNotificationRequest:(NCNotificationRequest *)notification {
-    if([TKOController sharedInstance].isTkoCall) return %orig;
-    [[TKOController sharedInstance] removeNotificationRequest:notification];
-}
-
-%new
-- (NSArray *) allRequests {
-    NSMutableArray *requests = [NSMutableArray new];
-    NSArray *sections = self.masterList.notificationSections;
-    for(NSInteger i = sections.count - 1; i >= 0; i--) {
-        NCNotificationStructuredSectionList *list = sections[i];
-        [requests addObjectsFromArray:list.allNotificationRequests];
-    }
-
-    return requests;
-}
-
-%end
 
 %hook NCNotificationMasterList
 - (void) setNotificationCount:(unsigned long long)arg1 {
@@ -174,49 +98,24 @@ void updatePrefs() {
 
         self.tkoView = [[TKOView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
         [TKOController sharedInstance].view = self.tkoView;
-        updatePrefs(); // Todo check this
         [self.stackView addArrangedSubview:self.tkoView];
-
-        if(self.tkoGroupView) [self.tkoGroupView hide];
     }
 }
 
--(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
+-(void)_insertItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    // TODO: Split this
-    if(self.tkoGroupView) {
-        [self.tkoGroupView hide];
-    }
-
+    // This way the view is always below the media player
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
-
-    if(![TKOController sharedInstance].prefGroupWhenMusic) unavailable = YES;
-    else {
-        self.tkoGroupView.needsFrameZero = YES;
-    }
 }
 
 -(void)_removeItem:(id)arg0 animated:(BOOL)arg1 {
     %orig;
 
-    if(self.tkoGroupView) {
-        [self.tkoGroupView hide];
-        if([TKOController sharedInstance].prefGroupWhenMusic) self.tkoGroupView.isUpdating = YES;
-    }
-
+    // This way the view is always below the media player
     [self.tkoView removeFromSuperview];
     [self.stackView addArrangedSubview:self.tkoView];
-    
-    if(![TKOController sharedInstance].prefGroupWhenMusic) unavailable = NO;
-    else {
-        // Ugly fix, but this prevent for not updating stackview frame
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            self.tkoGroupView.needsFrameZero = NO;
-            self.tkoGroupView.isUpdating = NO;
-        });
-    }
 }
 
 %end
@@ -224,12 +123,5 @@ void updatePrefs() {
 
 %ctor {
     if(![TKOController sharedInstance].isEnabled) return;
-
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updatePrefs, (CFStringRef)@"com.xyaman.takopreferences/ReloadPrefs", NULL, (CFNotificationSuspensionBehavior)kNilOptions);
-
-    // Group
-    if([TKOController sharedInstance].prefGroupAuthentication && [TKOController sharedInstance].prefLSGroupedIsEnabled) %init(GroupAuthentication);
-
-    updatePrefs();
     %init(TakoTweak);
 }

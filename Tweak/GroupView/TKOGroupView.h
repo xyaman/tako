@@ -2,6 +2,7 @@
 
 @interface TKOGroupView : UIView
 @property(nonatomic, retain) NSMutableArray *iconsView;
+
 @property(nonatomic) BOOL isVisible;
 @property(nonatomic) BOOL needsFrameZero;
 @property(nonatomic) BOOL isUpdating;

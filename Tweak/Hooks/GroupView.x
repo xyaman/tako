@@ -1,5 +1,5 @@
-#import "../Controller/TKOController.h"
-#import "IOSHeaders.h"
+#import "../IOSHeaders.h"
+#import "Shared.h"
 
 %hook CSNotificationAdjunctListViewController
 %property (nonatomic, retain) TKOGroupView *tkoGroupView;
@@ -19,6 +19,14 @@
         // Always at top
         [self.stackView insertArrangedSubview:self.tkoGroupView atIndex:0];
     }
+}
+
+-(void)_insertItem:(UIView *)arg0 animated:(BOOL)arg1 {
+    %orig;
+
+    // Make group be always at top
+    [self.tkoGroupView removeFromSuperview];
+    [self.stackView insertArrangedSubview:self.tkoGroupView atIndex:0];
 }
 %end
 
