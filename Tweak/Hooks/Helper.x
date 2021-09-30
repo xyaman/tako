@@ -2,6 +2,18 @@
 
 void updatePrefs() {}
 
+// Change iOS Notification count for our logic
+%hook NCNotificationMasterList
+- (void) setNotificationCount:(unsigned long long)arg1 {
+    %orig([TKOController sharedInstance].bundles.count);
+}
+
+- (unsigned long long) notificationCount {
+    return [TKOController sharedInstance].bundles.count;
+}
+%end
+
+// Dispatcher useful for really removing notifications (and not just visually removed)
 %hook SBNCNotificationDispatcher
 -(id)init {
     %orig;
@@ -49,6 +61,15 @@ void updatePrefs() {}
     }
 
     return requests;
+}
+%end
+
+
+// AutoUnlockX compatibility
+%hook SparkAutoUnlockX // From axon repo
+-(BOOL)externalBlocksUnlock {
+    if ([TKOController sharedInstance].bundles.count > 0) return YES;
+    return %orig;
 }
 %end
 
