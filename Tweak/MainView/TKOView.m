@@ -23,7 +23,6 @@
     
     // UICollection
     self.colView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.colLayout];
-    self.colView.clipsToBounds = YES;
     self.colView.delegate = self;
     self.colView.dataSource = self;
     self.colView.backgroundColor = [UIColor clearColor];
@@ -35,10 +34,10 @@
     [self addSubview:self.colView];
 
     self.colView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.colView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+    [self.colView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
     [self.colView.leftAnchor constraintEqualToAnchor:self.leftAnchor].active = YES;
     [self.colView.rightAnchor constraintEqualToAnchor:self.rightAnchor].active = YES;
-    [self.colView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [self.colView.heightAnchor constraintEqualToConstant:self.frame.size.height].active = YES;
 
     // Current cell list info
     self.cellsInfo = [NSMutableArray new];
@@ -71,6 +70,13 @@
 
 - (CGSize)intrinsicContentSize {
     return CGSizeMake(self.frame.size.width, self.frame.size.height);
+}
+
+- (void) reload {
+    self.colLayout.itemSize = [TKOCell cellSize];
+    [self.colLayout invalidateLayout];
+    [self invalidateIntrinsicContentSize];
+    [self.colView reloadData];
 }
 
 // iPad issue

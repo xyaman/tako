@@ -39,6 +39,8 @@
                 <string>cellStyle</string>
                 <key>defaults</key>
                 <string>com.xyaman.takopreferences</string>
+                <key>PostNotification</key>
+                <string>com.xyaman.takopreferences/ReloadPrefs</string>
             </dict>
 
 

@@ -27,6 +27,7 @@
 - (void) deselectCurrentCell;
 
 // Utils
+- (void) reload; // Used when preferences are updated
 - (NSInteger) getCellIndexByBundle:(NSString *)bundleID;
 - (void) sortCells;
 @end

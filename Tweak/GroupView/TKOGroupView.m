@@ -4,7 +4,7 @@
 #import "../Controller/TKOController.h"
 
 @interface TKOGroupView ()
-@property(nonatomic) CGRect oldTkoViewFrame;
+@property(nonatomic) CGRect oldFrame;
 @end
 
 @implementation TKOGroupView
@@ -13,7 +13,6 @@
 
     self.iconsView = [NSMutableArray arrayWithCapacity:3];
     self.isVisible = NO;
-    self.hidden = YES;
     self.taptic = [UISelectionFeedbackGenerator new];
 
     // View blur
@@ -90,10 +89,10 @@
     [[TKOController sharedInstance] hideAllNotifications];
 
     // Get old frame
-    self.oldTkoViewFrame = [TKOController sharedInstance].view.frame;
+    self.oldFrame = [TKOController sharedInstance].view.frame;
     [TKOController sharedInstance].view.hidden = YES;
 
-    if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.y, self.superview.frame.size.width, self.superview.frame.size.height - self.oldTkoViewFrame.size.height);
+    if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.y, self.superview.frame.size.width, self.superview.frame.size.height - self.oldFrame.size.height);
 }
 
 - (void) hide {
@@ -116,7 +115,7 @@
             [self.superview setNeedsLayout];
             [self.superview layoutIfNeeded]; 
 
-            if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.y, self.superview.frame.size.width, self.superview.frame.size.height + self.oldTkoViewFrame.size.height);
+            if(self.needsFrameZero) self.superview.frame = CGRectMake(self.superview.frame.origin.x, self.superview.frame.origin.y, self.superview.frame.size.width, self.superview.frame.size.height + self.oldFrame.size.height);
         }
     ];
 }

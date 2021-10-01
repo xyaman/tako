@@ -35,11 +35,10 @@ BOOL isLS = NO;
 -(BOOL)handleLockButtonPress {
     // This block is called when device is unlocked and is going to be locked. (we are entering to LS)
     if(!isLS) {
-        [[TKOController sharedInstance].groupView hide];
         [[TKOController sharedInstance] hideAllNotifications];
         [TKOController sharedInstance].view.selectedBundleID = nil;
         [[TKOController sharedInstance].view.colView reloadData]; 
-    
+
     // We are already on LS
     } else {
         [[TKOController sharedInstance].view prepareToHide];

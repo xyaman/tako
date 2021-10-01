@@ -4,6 +4,7 @@
 #import "../Controller/TKOController.h"
 
 @interface TKOCell ()
+@property(nonatomic) NSInteger _currentStyle;
 @end
 
 @implementation TKOCell
@@ -17,10 +18,15 @@
 
     // Blur view
     self.blur = [objc_getClass("MTMaterialView") materialViewWithRecipe:MTMaterialRecipeNotifications configuration:1];
-    self.blur.frame = self.bounds;
     self.blur.layer.cornerRadius = 13;
     self.blur.layer.cornerCurve = kCACornerCurveContinuous;
     [self addSubview:self.blur];
+
+    self.blur.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.blur.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+    [self.blur.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+    [self.blur.leftAnchor constraintEqualToAnchor:self.leftAnchor].active = YES;
+    [self.blur.rightAnchor constraintEqualToAnchor:self.rightAnchor].active = YES;
 
     // Close view
     self.closeView = [TKOCloseView new];
@@ -42,30 +48,76 @@
     self.taptic = [[UINotificationFeedbackGenerator alloc] init];
     self.willBeRemoved = NO;
 
+
+    // Save current value of cell style
+    self._currentStyle = [TKOController sharedInstance].prefCellStyle;
+
     // Setup style
-    if([TKOController sharedInstance].prefCellStyle == CellStyleDefault) [self setupDefault];
-    else if([TKOController sharedInstance].prefCellStyle == CellStyleAxonGrouped) [self setupAxonStyle];
-    else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon) [self setupFullIconWOBottomBar];
-    else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) [self setupFullIcon];
+    [self setupStyle];
 
     return self;
 }
 
 + (CGSize) cellSize {
     switch([TKOController sharedInstance].prefCellStyle) {
-        case CellStyleDefault:
-            return CGSizeMake(45, 60);
-            break;
-        case CellStyleAxonGrouped:
-            return CGSizeMake(58, 36);
-            break;
-        case CellStyleFullIcon:
-            return CGSizeMake(50, 51);
-        case CellStyleFullIconWBottomBar:
-            return CGSizeMake(50, 60);
+        case CellStyleDefault: return CGSizeMake(45, 60);
+        case CellStyleAxonGrouped: return CGSizeMake(58, 36);
+        case CellStyleFullIcon: return CGSizeMake(50, 51);
+        case CellStyleFullIconWBottomBar: return CGSizeMake(50, 60);
     };
 
     return CGSizeZero;
+}
+
+- (void) update {
+
+    // Update style if it has changed
+    if(self._currentStyle != [TKOController sharedInstance].prefCellStyle) {
+        // Load style
+        self._currentStyle = [TKOController sharedInstance].prefCellStyle;
+
+        // Remove old views
+        [self.iconView removeFromSuperview];
+        [self.countLabel removeFromSuperview];
+        [self.bottomBar removeFromSuperview];
+
+        self.blur.hidden = NO;
+        self.bottomBar = nil; // To reduce memory (in case new style doesnt use bottom bar)
+        self.layer.cornerRadius = 13;
+        self.blur.layer.cornerRadius = 13;
+        [self setupStyle];
+    }
+    
+
+    // Default style
+    if([TKOController sharedInstance].prefCellStyle == CellStyleDefault) {
+       self.iconView.image = self.bundle.icon ?: [UIImage new];
+
+    // Axon style
+    } else if([TKOController sharedInstance].prefCellStyle == CellStyleAxonGrouped) {
+        self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(21, 21)];
+
+        self.countLabel.backgroundColor = self.bundle.primaryColor;
+        self.countLabel.textColor = self.bundle.foregroundColor;
+
+    // Full icon
+    } else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon || [TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) {
+
+        self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(45, 45)];
+
+        self.countLabel.backgroundColor = self.bundle.primaryColor;
+        self.countLabel.textColor = self.bundle.foregroundColor;
+        self.bottomBar.backgroundColor = self.bundle.primaryColor;
+    }
+
+    self.countLabel.text = [NSString stringWithFormat:@"%ld", self.bundle.notifications.count];
+}
+
+- (void) setupStyle {
+    if([TKOController sharedInstance].prefCellStyle == CellStyleDefault) [self setupDefault];
+    else if([TKOController sharedInstance].prefCellStyle == CellStyleAxonGrouped) [self setupAxonStyle];
+    else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon) [self setupFullIconWOBottomBar];
+    else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) [self setupFullIcon];
 }
 
 - (void) setupDefault {
@@ -200,37 +252,14 @@
     self.backgroundColor = [UIColor clearColor];
     self.countLabel.backgroundColor = [UIColor clearColor];
     self.bottomBar.backgroundColor = [UIColor clearColor];
+    self.blur.hidden = NO;
     self.bundle = nil;
 
     // Only hide blur for full icon
     if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon || [TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) self.blur.hidden = YES;
 }
 
-- (void) update {
 
-    // Default style
-    if([TKOController sharedInstance].prefCellStyle == CellStyleDefault) {
-       self.iconView.image = self.bundle.icon ?: [UIImage new];
-
-    // Axon style
-    } else if([TKOController sharedInstance].prefCellStyle == CellStyleAxonGrouped) {
-        self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(21, 21)];
-
-        self.countLabel.backgroundColor = self.bundle.primaryColor;
-        self.countLabel.textColor = self.bundle.foregroundColor;
-
-    // Full icon
-    } else if([TKOController sharedInstance].prefCellStyle == CellStyleFullIcon || [TKOController sharedInstance].prefCellStyle == CellStyleFullIconWBottomBar) {
-
-        self.iconView.image = [self.bundle resizedIconWithSize:CGSizeMake(45, 45)];
-
-        self.countLabel.backgroundColor = self.bundle.primaryColor;
-        self.countLabel.textColor = self.bundle.foregroundColor;
-        self.bottomBar.backgroundColor = self.bundle.primaryColor;
-    }
-
-    self.countLabel.text = [NSString stringWithFormat:@"%ld", self.bundle.notifications.count];
-}
 
 - (void) setSelected:(BOOL)selected {
     [super setSelected:selected];

@@ -1,6 +1,19 @@
 #import "Shared.h"
 
-void updatePrefs() {}
+void updatePrefs() {
+
+    CGRect newFrame = [TKOController sharedInstance].view.frame;
+    if([TKOController sharedInstance].prefCellStyle == 0)  newFrame.size.height = 90; // Default
+    else if([TKOController sharedInstance].prefCellStyle == 1) newFrame.size.height = 65; // Axon grouped
+    else if([TKOController sharedInstance].prefCellStyle == 2) newFrame.size.height = 80; // Full icon
+    else if([TKOController sharedInstance].prefCellStyle == 3) newFrame.size.height = 80; // Full icon w/ bottom bar
+
+    [TKOController sharedInstance].view.frame = newFrame;
+    [TKOController sharedInstance].view.superview.frame = CGRectZero; // This forces a layout update
+
+    [[TKOController sharedInstance].view reload]; // Reload main view
+    [[TKOController sharedInstance].groupView reload]; // Relod group view
+}
 
 // Change iOS Notification count for our logic
 %hook NCNotificationMasterList
